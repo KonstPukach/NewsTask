@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">NewsTask</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search_news">Search news</string>
+    <string name="show_more">...show more</string>
+    <string name="hide_more">...hide</string>
+    <string name="nothing_found">Nothing found</string>
 </resources>
