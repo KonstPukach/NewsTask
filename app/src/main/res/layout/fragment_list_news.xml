@@ -18,5 +18,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"/>
+        <TextView
+            android:id="@+id/text_view_nothing_found"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:text="@string/nothing_found"
+            android:textSize="26sp"/>
     </FrameLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

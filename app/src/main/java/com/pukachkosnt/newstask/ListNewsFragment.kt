@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.paging.LoadState
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -31,13 +32,15 @@ class ListNewsFragment : Fragment() {
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var progressBarLoad: ProgressBar
-    private var pageCounter = 0
-    private var currentSearchQuery = ""
+    private lateinit var textViewNothingFound: TextView
+
+    private var currentSearchQuery = ""     // needed to refresh list
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         newsViewModel = ViewModelProvider(this).get(NewsViewModel::class.java)
+        newsViewModel.fetchNews()
     }
 
     override fun onCreateView(
@@ -46,12 +49,13 @@ class ListNewsFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_list_news, container, false)
-        progressBarLoad = view.findViewById(R.id.progress_bar_load)
 
+        progressBarLoad = view.findViewById(R.id.progress_bar_load)
+        textViewNothingFound = view.findViewById(R.id.text_view_nothing_found)
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_list_news)
-        swipeRefreshLayout.setOnRefreshListener {
-            pageCounter = 0
-            newsViewModel = NewsViewModel(currentSearchQuery)
+
+        swipeRefreshLayout.setOnRefreshListener {       //  setup refreshing
+            newsViewModel.fetchNews(currentSearchQuery)
             isUpdated = true
             recyclerViewNews.adapter?.notifyDataSetChanged()
         }
@@ -70,16 +74,15 @@ class ListNewsFragment : Fragment() {
         val searchView = searchItem.actionView as SearchView
 
         fun onSearch(query: String): Boolean {
-            pageCounter = 0
             currentSearchQuery = query
-            newsViewModel = NewsViewModel(currentSearchQuery)
+            newsViewModel.fetchNews(currentSearchQuery)
             isUpdated = true
             recyclerViewNews.adapter?.notifyDataSetChanged()
             hideKeyboard()
             return true
         }
 
-        searchView.apply {
+        searchView.apply {      // setting up searchView
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     return onSearch(query ?: "")
@@ -108,7 +111,6 @@ class ListNewsFragment : Fragment() {
     private fun setupRecyclerView() {
         recyclerViewNews.viewTreeObserver.addOnGlobalLayoutListener {
             if (recyclerViewNews.layoutManager == null || isUpdated) {
-                progressBarLoad.visibility = View.VISIBLE
                 isUpdated = false
                 val columns: Int = recyclerViewNews.width / MAX_ITEM_WIDTH // count columns number
                 recyclerViewNews.apply {
@@ -117,17 +119,31 @@ class ListNewsFragment : Fragment() {
                     } else {
                         GridLayoutManager(context, columns)
                     }
+
                     setHasFixedSize(true)
+
                     newsAdapter = NewsAdapter()
+                    newsAdapter.addLoadStateListener {
+                        if (it.refresh == LoadState.Loading) {
+                            progressBarLoad.visibility = View.VISIBLE       // show pBar
+                            textViewNothingFound.visibility = View.GONE     // hide others
+                        } else {
+                            if (newsAdapter.snapshot().isEmpty()) {
+                                textViewNothingFound.visibility = View.VISIBLE  // if list is empty
+                            } else {                                            // show "Nothing changed"
+                                recyclerViewNews.visibility = View.VISIBLE      // if it's not empty
+                                textViewNothingFound.visibility = View.GONE     // show a list, hide others
+                            }
+                            progressBarLoad.visibility = View.GONE
+                        }
+                    }
                     adapter = newsAdapter
-                    newsViewModel.newsItemsLiveData.observe(
+
+                    newsViewModel.newsItemsLiveData.observe(    // submit data to an adapter
                         viewLifecycleOwner,
                         {
-                            pageCounter++
-                            if (pageCounter < 7) {
-                                it?.let {
-                                    newsAdapter.submitData(lifecycle, it)
-                                }
+                            it?.let {
+                                newsAdapter.submitData(lifecycle, it)
                             }
                         }
                     )
@@ -135,7 +151,6 @@ class ListNewsFragment : Fragment() {
             }
         }
     }
-
 
 
     // ####### VIEW HOLDER #########
@@ -215,13 +230,10 @@ class ListNewsFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: ArticleHolder, position: Int) {
-            if (progressBarLoad.visibility == View.VISIBLE) {   // hide pBar
-                recyclerViewNews.visibility = View.VISIBLE
-                progressBarLoad.visibility = View.GONE
-            }
             holder.bind(getItem(position)!!)
         }
     }
+
 
     companion object {
         fun newInstance() = ListNewsFragment()

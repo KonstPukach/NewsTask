@@ -6,21 +6,15 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-private const val BASE_URL = ""
-
 class NewsApiFact {
     class Builder {
+        private var _baseUrl = ""
 
-        var searchQuery = ""
-        var baseUrl = ""
-
-        fun addSearchQuery(query: String): Builder {
-            searchQuery = query
-            return this
-        }
+        val baseUrl: String
+            get() = _baseUrl
 
         fun addBaseUrl(url: String): Builder {
-            baseUrl = url
+            _baseUrl = url
             return this
         }
 
@@ -32,7 +26,7 @@ class NewsApiFact {
     companion object {
         private fun buildNewsApi(builder: Builder): NewsApi {
             val client = OkHttpClient.Builder()
-                .addInterceptor(NewsQueryInterceptor(builder.searchQuery))
+                .addInterceptor(NewsQueryInterceptor())
                 .build()
             val moshi = Moshi.Builder()
                 .add(KotlinJsonAdapterFactory())
@@ -45,5 +39,4 @@ class NewsApiFact {
             return retrofit.create(NewsApi::class.java)
         }
     }
-
 }

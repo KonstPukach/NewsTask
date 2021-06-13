@@ -9,16 +9,10 @@ import retrofit2.http.Query
 
 
 interface NewsApi {
-    @GET("v2/everything?domains=3dnews.ru")
-    fun fetchNewsWithTimeInterval(
-        @Query("from") dateFrom: String,
-        @Query("to") dateTo: String,
-        @Query("page") page: Int
-    ): Call<News>
-
     @GET("v2/everything?domains=3dnews.ru&page=1")
     suspend fun fetchNewsWithTimeIntervalAsync(
         @Query("from") dateFrom: String,
-        @Query("to") dateTo: String
+        @Query("to") dateTo: String,
+        @Query("q") query: String
     ): Response<News>
 }

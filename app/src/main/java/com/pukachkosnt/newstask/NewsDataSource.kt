@@ -13,6 +13,7 @@ private const val TAG = "NewsDataSource"
 
 class NewsDataSource(
     private val newsFetchRepository: NewsFetchRepository,
+    private val searchQuery: String,
     private val maxPages: Int) :
     PagingSource<Int, Article>() {
 
@@ -39,7 +40,8 @@ class NewsDataSource(
             }
             val response = newsFetchRepository.fetchNewsWithTimeInterval(
                 calendarStart.time,
-                calendarFinish.time
+                calendarFinish.time,
+                searchQuery
             )
             if (response.isSuccessful) {
                 val data = response.body()?.articlesList
