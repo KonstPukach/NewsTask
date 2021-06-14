@@ -27,6 +27,7 @@ class NewsDataSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Article> {
         return try {
             val pageNumber = params.key ?: 0
+
             if (pageNumber >= maxPages - 1) {
                 Log.d(TAG, "End loading: $pageNumber")
                 throw IOException()

@@ -23,9 +23,14 @@ class NewsViewModel : ViewModel() {
                 NewsDataSource(NewsFetchRepository(newsApi), it ?: "", MAX_PAGES)   // set factory
             }.liveData.cachedIn(viewModelScope)
         }
+        fetchNews()
     }
 
     fun fetchNews(query: String = "") {
         mutableSearchQuery.value = query
+    }
+
+    fun updateNews() {
+        mutableSearchQuery.value = mutableSearchQuery.value
     }
 }

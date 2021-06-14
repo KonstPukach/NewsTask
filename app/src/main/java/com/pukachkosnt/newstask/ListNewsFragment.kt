@@ -34,13 +34,11 @@ class ListNewsFragment : Fragment() {
     private lateinit var progressBarLoad: ProgressBar
     private lateinit var textViewNothingFound: TextView
 
-    private var currentSearchQuery = ""     // needed to refresh list
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         newsViewModel = ViewModelProvider(this).get(NewsViewModel::class.java)
-        newsViewModel.fetchNews()
+        //newsViewModel.fetchNews()
     }
 
     override fun onCreateView(
@@ -55,7 +53,7 @@ class ListNewsFragment : Fragment() {
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_list_news)
 
         swipeRefreshLayout.setOnRefreshListener {       //  setup refreshing
-            newsViewModel.fetchNews(currentSearchQuery)
+            newsViewModel.updateNews()
             isUpdated = true
             recyclerViewNews.adapter?.notifyDataSetChanged()
         }
@@ -74,8 +72,7 @@ class ListNewsFragment : Fragment() {
         val searchView = searchItem.actionView as SearchView
 
         fun onSearch(query: String): Boolean {
-            currentSearchQuery = query
-            newsViewModel.fetchNews(currentSearchQuery)
+            newsViewModel.fetchNews(query)
             isUpdated = true
             recyclerViewNews.adapter?.notifyDataSetChanged()
             hideKeyboard()

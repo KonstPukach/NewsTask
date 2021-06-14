@@ -5,7 +5,7 @@ import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 
-private const val API_KEY = "c8be613a9ae54483b76f9983abcdb548"
+private const val API_KEY = "f3841e980fca46f4b5a680b4f79c9d61"
 
 class NewsQueryInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
