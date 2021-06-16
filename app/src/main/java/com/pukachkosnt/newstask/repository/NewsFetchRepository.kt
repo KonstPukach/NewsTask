@@ -1,18 +1,21 @@
-package com.pukachkosnt.newstask.api
+package com.pukachkosnt.newstask.repository
 
+import com.pukachkosnt.newstask.api.NewsApi
 import com.pukachkosnt.newstask.models.News
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 private const val TAG = "NewsFetchRepository"
 
-class NewsFetchRepository(private val newsApi: NewsApi) {
+// Data layer. Repository receives data from a data source
 
-    suspend fun fetchNewsWithTimeInterval(
+class NewsFetchRepository(private val newsApi: NewsApi) : BaseRepository {
+    override suspend fun fetchNewsWithTimeInterval(
         dateStart: Date,
         dateFinish: Date,
-        query: String = ""
+        query: String
     ): Response<News> {
 
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")

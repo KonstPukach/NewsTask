@@ -3,30 +3,35 @@ package com.pukachkosnt.newstask.animations
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.view.animation.DecelerateInterpolator
-import android.widget.TextView
+import android.widget.LinearLayout
 
-fun showMoreTextViewAnimation(textView: TextView, textViewShowMore: TextView) {
-    val animationYdown = ObjectAnimator.ofFloat(textView, "translationY", -140f)
-    val animationYup2 = ObjectAnimator.ofFloat(textViewShowMore, "translationY", -140f)
-    val animationYup = ObjectAnimator.ofFloat(textView, "translationY", -150f)
+const val SHOW_MORE_ANIM_DURATION = 180L
+const val START_Y_POSITION = 0f
+const val INTERMEDIATE_Y_POSITION = -190f
+const val SINGLE_LINE_HEIGHT = 25f
+
+
+fun showMoreTextViewAnimation(linLayout: LinearLayout, linesCount: Int) {
+    val animationYDown = ObjectAnimator.ofFloat(linLayout, "translationY",
+        -SINGLE_LINE_HEIGHT * (linesCount + 1))
+    val animationYup = ObjectAnimator.ofFloat(linLayout, "translationY",
+        -SINGLE_LINE_HEIGHT * (linesCount + 2))
     val set = AnimatorSet()
-    set.play(animationYdown)
-        .after(animationYup)
-        .with(animationYup2)
-    set.duration = 180
+    set.play(animationYDown)
+        .with(animationYup)
+    set.duration = SHOW_MORE_ANIM_DURATION
     set.interpolator = DecelerateInterpolator()
     set.start()
 }
 
-fun hideMoreTextViewAnimation(textView: TextView, textViewShowMore: TextView) {
-    val animationYDown = ObjectAnimator.ofFloat(textView, "translationY", 0f)
-    val animationY2Down = ObjectAnimator.ofFloat(textViewShowMore, "translationY", 0f)
-    val animationYUp = ObjectAnimator.ofFloat(textView, "translationY", -150f)
+fun hideMoreTextViewAnimation(linLayout: LinearLayout) {
+    val animationYDown = ObjectAnimator.ofFloat(linLayout, "translationY", START_Y_POSITION)
+    val animationYUp = ObjectAnimator.ofFloat(linLayout, "translationY", INTERMEDIATE_Y_POSITION)
     val set = AnimatorSet()
-    set.play(animationYDown)
-        .after(animationYUp)
-        .with(animationY2Down)
-    set.duration = 180
+    set
+        .play(animationYUp)
+        .with(animationYDown)
+    set.duration = SHOW_MORE_ANIM_DURATION
     set.interpolator = DecelerateInterpolator()
     set.start()
 }

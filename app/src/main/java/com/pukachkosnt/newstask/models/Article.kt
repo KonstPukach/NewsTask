@@ -3,8 +3,8 @@ package com.pukachkosnt.newstask.models
 import com.squareup.moshi.Json
 
 
-class Article {
-    @Json(name = "title") var title: String = ""
-    @Json(name = "description") var description: String = ""
-    @Json(name = "urlToImage") var urlToImage: String = ""
-}
+data class Article (
+    @Json(name = "title") val title: String,
+    @Json(name = "description") val description: String,
+    @Json(name = "urlToImage") val urlToImage: String
+)
