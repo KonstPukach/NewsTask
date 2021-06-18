@@ -1,11 +1,9 @@
-package com.pukachkosnt.newstask.repository
+package com.pukachkosnt.newstask
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import com.pukachkosnt.newstask.ArticleHolder
-import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.models.ArticleEntity
 
 class NewsAdapter(private val layoutInflater: LayoutInflater) :

@@ -4,16 +4,13 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.pukachkosnt.newstask.mapper.ApiToEntityMapper
-import com.pukachkosnt.newstask.mapper.BaseMapper
-import com.pukachkosnt.newstask.models.Article
 import com.pukachkosnt.newstask.models.ArticleEntity
 import com.pukachkosnt.newstask.repository.BaseRepository
-import com.pukachkosnt.newstask.repository.NewsFetchRepository
-import org.w3c.dom.Entity
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.*
-import javax.inject.Inject
+
+// Domain layer
 
 class NewsDataSource(
     private val newsFetchRepository: BaseRepository,

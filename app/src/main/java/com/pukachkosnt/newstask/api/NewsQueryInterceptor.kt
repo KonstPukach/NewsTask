@@ -7,7 +7,7 @@ import okhttp3.Response
 
 class NewsQueryInterceptor : Interceptor {
     companion object {
-        private const val API_KEY = "c8be613a9ae54483b76f9983abcdb548"
+        private const val API_KEY = "f3841e980fca46f4b5a680b4f79c9d61"
         private const val PAGE_SIZE = "100"
     }
 

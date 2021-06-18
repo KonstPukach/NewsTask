@@ -6,6 +6,7 @@ import com.pukachkosnt.newstask.models.ArticleEntity
 class NewsRecyclerViewState {
     var state: State = State.FULL
     var data: PagingData<ArticleEntity> = PagingData.empty()
+    var isEmpty: Boolean = true
 
     enum class State {
         FULL,   // When data is shown without filters
