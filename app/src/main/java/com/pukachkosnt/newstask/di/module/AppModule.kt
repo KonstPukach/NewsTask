@@ -1,11 +1,11 @@
 package com.pukachkosnt.newstask.di.module
 
+import com.pukachkosnt.data.api.NewsApi
+import com.pukachkosnt.data.api.NewsQueryInterceptor
+import com.pukachkosnt.data.repository.BaseRepository
+import com.pukachkosnt.data.repository.NewsFetchRepository
 import com.pukachkosnt.newstask.NewsRecyclerViewState
 import com.pukachkosnt.newstask.SearchViewState
-import com.pukachkosnt.newstask.api.NewsApi
-import com.pukachkosnt.newstask.api.NewsQueryInterceptor
-import com.pukachkosnt.newstask.repository.BaseRepository
-import com.pukachkosnt.newstask.repository.NewsFetchRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.Interceptor

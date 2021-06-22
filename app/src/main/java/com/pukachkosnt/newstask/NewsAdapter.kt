@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import com.pukachkosnt.newstask.models.ArticleEntity
+import com.pukachkosnt.domain.models.ArticleEntity
 
 class NewsAdapter(private val layoutInflater: LayoutInflater) :
     PagingDataAdapter<ArticleEntity, ArticleHolder>(REPO_COMPARATOR) {

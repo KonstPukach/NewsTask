@@ -2,13 +2,14 @@ package com.pukachkosnt.newstask
 
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.pukachkosnt.newstask.models.ArticleEntity
-import com.pukachkosnt.newstask.repository.BaseRepository
+import com.pukachkosnt.domain.models.ArticleEntity
+import com.pukachkosnt.data.repository.BaseRepository
+import com.pukachkosnt.domain.NewsDataSource
 
 
 class NewsViewModel(
-    private val searchViewState: SearchViewState,
-    private val recyclerViewState: NewsRecyclerViewState,
+    val searchViewState: SearchViewState,
+    val recyclerViewState: NewsRecyclerViewState,
     private val newsRepository: BaseRepository
 ) : ViewModel() {
     companion object {
@@ -16,17 +17,16 @@ class NewsViewModel(
         private const val PAGE_SIZE = 1
     }
     private var fetched = false
+
+    private var _rotated = true     // set true as soon as device is rotated
+    val rotated: Boolean
+        get() = _rotated
+
     val newsItemsLiveData: LiveData<PagingData<ArticleEntity>>
-    var recyclerViewItems: List<ArticleEntity> = listOf()   // stores the list of last filtered data
+    private var recyclerViewItems: List<ArticleEntity> = listOf()   // stores the list of last filtered data
 
     private val mutableSearchQuery = MutableLiveData<String>()
     private val filteredItemsLiveData = MutableLiveData<PagingData<ArticleEntity>>()
-
-    val getSearchViewState: SearchViewState
-        get() = searchViewState
-
-    val getRecyclerViewState: NewsRecyclerViewState
-        get() = recyclerViewState
 
     init {
         newsItemsLiveData = Transformations.switchMap(mutableSearchQuery) {
@@ -35,18 +35,26 @@ class NewsViewModel(
                 filteredItemsLiveData
             } else {
                 fetched = true
-                Pager(PagingConfig(PAGE_SIZE)) {
-                    NewsDataSource(
+                val pager = Pager(PagingConfig(PAGE_SIZE)) {
+                    NewsDataSource(     // set factory
                         newsRepository,
-                        mutableSearchQuery.value ?: "", MAX_PAGES
-                    )   // set factory
-                }.liveData.cachedIn(viewModelScope)
+                        mutableSearchQuery.value ?: "",
+                        MAX_PAGES,
+                        this
+                    ).addDataList {
+                        recyclerViewItems = it
+                    }
+                }
+
+                pager.liveData.cachedIn(viewModelScope)
             }
         }
         fetchNews()
+        _rotated = true
     }
 
     fun fetchNews(query: String = "") {
+        _rotated = false
         fetched = false
         searchViewState.state = SearchViewState.State.CLOSED
         recyclerViewState.apply {
@@ -58,6 +66,8 @@ class NewsViewModel(
 
     // filtering received data and managing widgets states
     fun filterNews(query: String) {
+        _rotated = false
+        val trimQuery = query.trim()
         searchViewState.apply {
             state = SearchViewState.State.UNFOCUSED
             searchQuery = query
@@ -65,11 +75,31 @@ class NewsViewModel(
         recyclerViewState.apply {
             state = NewsRecyclerViewState.State.FILTERED
             val list = recyclerViewItems.filter {
-                it.title.contains(query, true)
+                it.title.contains(trimQuery, true)
             }
             data = PagingData.from(list)
             isEmpty = list.isEmpty()
         }
-        mutableSearchQuery.value = query
+        mutableSearchQuery.value = trimQuery
+    }
+
+    fun updateSearchViewState(
+        hasFocus: Boolean? = null,
+        searchQuery: String? = null
+    ) {
+        hasFocus?.let {
+            searchViewState.state = if (it) {
+                SearchViewState.State.FOCUSED_WITH_KEYBOARD
+            } else {
+                SearchViewState.State.UNFOCUSED
+            }
+        }
+        searchQuery?.let {
+            searchViewState.searchQuery = it
+        }
+    }
+
+    fun rotate() {
+        _rotated = true
     }
 }

@@ -1,2 +1,4 @@
 rootProject.name = "NewsTask"
 include ':app'
+include ':domain'
+include ':data'

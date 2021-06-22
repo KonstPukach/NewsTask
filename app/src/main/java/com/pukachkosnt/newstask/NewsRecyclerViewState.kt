@@ -1,7 +1,7 @@
 package com.pukachkosnt.newstask
 
 import androidx.paging.PagingData
-import com.pukachkosnt.newstask.models.ArticleEntity
+import com.pukachkosnt.domain.models.ArticleEntity
 
 class NewsRecyclerViewState {
     var state: State = State.FULL

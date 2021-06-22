@@ -8,7 +8,7 @@ import androidx.core.view.doOnPreDraw
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.pukachkosnt.newstask.animations.moveViewPosition
-import com.pukachkosnt.newstask.models.ArticleEntity
+import com.pukachkosnt.domain.models.ArticleEntity
 import com.squareup.picasso.Picasso
 
 class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
