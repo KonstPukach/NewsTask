@@ -2,104 +2,109 @@ package com.pukachkosnt.newstask
 
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.pukachkosnt.domain.models.ArticleEntity
-import com.pukachkosnt.data.repository.BaseRepository
 import com.pukachkosnt.domain.NewsDataSource
+import com.pukachkosnt.domain.models.ArticleEntity
+import com.pukachkosnt.domain.repository.BaseRepository
 
 
 class NewsViewModel(
-    val searchViewState: SearchViewState,
-    val recyclerViewState: NewsRecyclerViewState,
+    private var _searchViewState: SearchViewState,
+    private var _recyclerViewState: NewsRecyclerViewState,
     private val newsRepository: BaseRepository
 ) : ViewModel() {
     companion object {
         private const val MAX_PAGES = 7
         private const val PAGE_SIZE = 1
     }
-    private var fetched = false
 
-    private var _rotated = true     // set true as soon as device is rotated
-    val rotated: Boolean
-        get() = _rotated
+    val searchViewState: SearchViewState
+        get() = _searchViewState
+    val recyclerViewState: NewsRecyclerViewState
+        get() = _recyclerViewState
 
-    val newsItemsLiveData: LiveData<PagingData<ArticleEntity>>
-    private var recyclerViewItems: List<ArticleEntity> = listOf()   // stores the list of last filtered data
+    private val _newsItemsLiveData: MediatorLiveData<PagingData<ArticleEntity>> = MediatorLiveData()
+    val newsItemsLiveData: LiveData<PagingData<ArticleEntity>> = _newsItemsLiveData
 
-    private val mutableSearchQuery = MutableLiveData<String>()
+    private var loadedDataList: List<ArticleEntity> = listOf()   // stores the full list of loaded data
+
     private val filteredItemsLiveData = MutableLiveData<PagingData<ArticleEntity>>()
 
-    init {
-        newsItemsLiveData = Transformations.switchMap(mutableSearchQuery) {
-            if (fetched) {
-                filteredItemsLiveData.value = recyclerViewState.data
-                filteredItemsLiveData
-            } else {
-                fetched = true
-                val pager = Pager(PagingConfig(PAGE_SIZE)) {
-                    NewsDataSource(     // set factory
-                        newsRepository,
-                        mutableSearchQuery.value ?: "",
-                        MAX_PAGES,
-                        this
-                    ).addDataList {
-                        recyclerViewItems = it
-                    }
-                }
+    private var pagerLiveData: LiveData<PagingData<ArticleEntity>> = MutableLiveData()
 
-                pager.liveData.cachedIn(viewModelScope)
-            }
-        }
+    private var loadedPagingData: PagingData<ArticleEntity> = PagingData.empty()
+
+    init {
         fetchNews()
-        _rotated = true
     }
 
-    fun fetchNews(query: String = "") {
-        _rotated = false
-        fetched = false
-        searchViewState.state = SearchViewState.State.CLOSED
-        recyclerViewState.apply {
-            state = NewsRecyclerViewState.State.FULL
-            data = PagingData.empty()   // reset the list of news
+    fun fetchNews() {
+        _searchViewState = _searchViewState.copy(state = SearchViewState.State.CLOSED)
+        _recyclerViewState = _recyclerViewState.copy(state = NewsRecyclerViewState.State.FULL)
+
+        // remove previous source
+        _newsItemsLiveData.removeSource(pagerLiveData)
+
+        pagerLiveData = Pager(PagingConfig(PAGE_SIZE)) {
+            NewsDataSource(     // set factory
+                newsRepository,
+                "",
+                MAX_PAGES
+            ).also {
+                loadedDataList = it.dataList
+            }
+        }.liveData.cachedIn(viewModelScope)
+
+        // add new source
+        _newsItemsLiveData.addSource(pagerLiveData) {
+            _newsItemsLiveData.value = it
+            loadedPagingData = it
         }
-        mutableSearchQuery.value = query
     }
 
     // filtering received data and managing widgets states
     fun filterNews(query: String) {
-        _rotated = false
         val trimQuery = query.trim()
-        searchViewState.apply {
-            state = SearchViewState.State.UNFOCUSED
+        _searchViewState = _searchViewState.copy(
+            state = SearchViewState.State.UNFOCUSED,
             searchQuery = query
+        )
+        val list = loadedDataList.filter {
+            it.title.contains(trimQuery, true)
         }
-        recyclerViewState.apply {
-            state = NewsRecyclerViewState.State.FILTERED
-            val list = recyclerViewItems.filter {
-                it.title.contains(trimQuery, true)
-            }
-            data = PagingData.from(list)
+        _recyclerViewState = _recyclerViewState.copy(
+            state = NewsRecyclerViewState.State.FILTERED,
             isEmpty = list.isEmpty()
+        )
+        _newsItemsLiveData.removeSource(filteredItemsLiveData)  // remove previous source
+        filteredItemsLiveData.value = PagingData.from(list)
+        _newsItemsLiveData.addSource(filteredItemsLiveData) {
+            _newsItemsLiveData.value = it
         }
-        mutableSearchQuery.value = trimQuery
+    }
+
+    fun restorePagingData() {
+        _searchViewState = _searchViewState.copy(state = SearchViewState.State.CLOSED)
+        _recyclerViewState = _recyclerViewState.copy(state = NewsRecyclerViewState.State.FULL)
+
+        _newsItemsLiveData.value = loadedPagingData     // restore the full list of PagingData
     }
 
     fun updateSearchViewState(
         hasFocus: Boolean? = null,
         searchQuery: String? = null
     ) {
+        var state = _searchViewState.state
+        var query = _searchViewState.searchQuery
+
         hasFocus?.let {
-            searchViewState.state = if (it) {
+            state = if (it) {
                 SearchViewState.State.FOCUSED_WITH_KEYBOARD
             } else {
                 SearchViewState.State.UNFOCUSED
             }
         }
-        searchQuery?.let {
-            searchViewState.searchQuery = it
-        }
-    }
+        searchQuery?.let { query = it }
 
-    fun rotate() {
-        _rotated = true
+        _searchViewState = _searchViewState.copy(state = state, searchQuery = query)
     }
 }

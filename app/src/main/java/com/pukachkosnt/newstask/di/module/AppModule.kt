@@ -2,8 +2,8 @@ package com.pukachkosnt.newstask.di.module
 
 import com.pukachkosnt.data.api.NewsApi
 import com.pukachkosnt.data.api.NewsQueryInterceptor
-import com.pukachkosnt.data.repository.BaseRepository
 import com.pukachkosnt.data.repository.NewsFetchRepository
+import com.pukachkosnt.domain.repository.BaseRepository
 import com.pukachkosnt.newstask.NewsRecyclerViewState
 import com.pukachkosnt.newstask.SearchViewState
 import com.squareup.moshi.Moshi

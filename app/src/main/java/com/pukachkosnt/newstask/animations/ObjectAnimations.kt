@@ -4,7 +4,6 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import android.widget.LinearLayout
 
 const val ANIM_DURATION = 180L
 

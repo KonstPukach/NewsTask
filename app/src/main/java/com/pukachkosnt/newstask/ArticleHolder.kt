@@ -5,6 +5,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.pukachkosnt.newstask.animations.moveViewPosition
@@ -32,20 +33,13 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     init {
         // set "show more" when layout parameters are known
         // measures view, when the text changes
-        textViewDescription.doAfterTextChanged {
-            setupShowMore()
-        }
+        textViewDescription.doAfterTextChanged { setupShowMore() }
         // measures the view, when the view was drawn
-        textViewDescription.doOnPreDraw {
-            setupShowMore()
-        }
+        textViewDescription.doOnPreDraw { setupShowMore() }
 
         textViewShowMore.setOnClickListener {
-            if (showMoreState) {
-                hideMore()
-            } else {
-                showMore()
-            }
+            if (showMoreState) hideMore()
+            else showMore()
             showMoreState = !showMoreState
         }
     }
@@ -67,17 +61,15 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private fun setupShowMore() {
         if (textViewDescription.width > 0) {
-            if (textViewDescription.lineCount > MAX_LINES_COLLAPSED) {
-                textViewShowMore.visibility = View.VISIBLE
-            }
+            textViewShowMore.isVisible = textViewDescription.lineCount > MAX_LINES_COLLAPSED
         }
     }
 
     private fun initialSetupTranslation() {     // every item need to be set up in onBind()
         linLayout.translationY = START_Y_POSITION   // because animation changes item's Y coordinate
         textViewDescription.maxLines = MAX_LINES_COLLAPSED
-        textViewTitle.visibility = View.VISIBLE
-        textViewShowMore.visibility = View.GONE
+        textViewTitle.isVisible = true
+        textViewShowMore.isVisible = false
         textViewShowMore.setText(R.string.show_more)
     }
 
@@ -88,7 +80,7 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             -(textViewDescription.lineCount + 1) * SINGLE_LINE_HEIGHT,
             -(textViewDescription.lineCount + 2) * SINGLE_LINE_HEIGHT
         )
-        textViewTitle.visibility = View.INVISIBLE
+        textViewTitle.isVisible = false
         textViewShowMore.setText(R.string.hide_more)
     }
 
@@ -99,7 +91,7 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             START_Y_POSITION,
             -(textViewDescription.lineCount + 2) * SINGLE_LINE_HEIGHT
         )
-        textViewTitle.visibility = View.VISIBLE
+        textViewTitle.isVisible = true
         textViewShowMore.setText(R.string.show_more)
     }
 }

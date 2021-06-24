@@ -1,13 +1,9 @@
 package com.pukachkosnt.newstask
 
-import androidx.paging.PagingData
-import com.pukachkosnt.domain.models.ArticleEntity
-
-class NewsRecyclerViewState {
-    var state: State = State.FULL
-    var data: PagingData<ArticleEntity> = PagingData.empty()
-    var isEmpty: Boolean = true
-
+data class NewsRecyclerViewState (
+    val state: State = State.FULL,
+    val isEmpty: Boolean = true
+) {
     enum class State {
         FULL,   // When data is shown without filters
         FILTERED    // When data is shown with filters. Then we should stop paging.

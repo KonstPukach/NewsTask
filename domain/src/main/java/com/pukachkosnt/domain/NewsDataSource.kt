@@ -1,12 +1,10 @@
 package com.pukachkosnt.domain
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.pukachkosnt.data.repository.BaseRepository
-import com.pukachkosnt.domain.mapper.ApiToEntityMapper
 import com.pukachkosnt.domain.models.ArticleEntity
+import com.pukachkosnt.domain.repository.BaseRepository
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.*
@@ -16,15 +14,15 @@ import java.util.*
 class NewsDataSource(
     private val newsFetchRepository: BaseRepository,
     private val searchQuery: String,
-    private val maxPages: Int,
-    private val viewModel: ViewModel
-    ) : PagingSource<Int, ArticleEntity>() {
+    private val maxPages: Int
+) : PagingSource<Int, ArticleEntity>() {
 
     companion object {
         private const val TAG = "NewsDataSource"
     }
 
-    private val dataList: MutableList<ArticleEntity> = mutableListOf()
+    private val _dataList: MutableList<ArticleEntity> = mutableListOf()
+    val dataList: List<ArticleEntity> = _dataList
 
     override fun getRefreshKey(state: PagingState<Int, ArticleEntity>): Int? {
         return state.anchorPosition?.let {
@@ -52,37 +50,27 @@ class NewsDataSource(
             val calendarFinish = Calendar.getInstance().apply {
                 add(Calendar.DATE, - pageNumber)
             }
-            val response = newsFetchRepository.fetchNewsWithTimeInterval(
+            val data: List<ArticleEntity> = newsFetchRepository.fetchNewsWithTimeInterval(
                 calendarStart.time,
                 calendarFinish.time,
                 searchQuery
             )
-            if (response.isSuccessful) {
-                val data = response.body()?.articlesList?.map { ApiToEntityMapper.map(it) }
-                val prevKey = if (pageNumber > 0) pageNumber - 1 else null
-                val nextKey = if (response.body()?.articlesList?.isNotEmpty()!!) pageNumber + 1
-                                else null
-                if (pageNumber == 0)
-                    dataList.clear()
-                dataList.addAll(data ?: listOf())
+            val prevKey = if (pageNumber > 0) pageNumber - 1 else null
+            val nextKey = if (data.isNotEmpty()) pageNumber + 1 else null
 
-                LoadResult.Page(
-                    data = data ?: listOf(),
-                    prevKey = prevKey,
-                    nextKey = nextKey
-                )
-            } else {
-                LoadResult.Error(HttpException(response))
-            }
+            if (pageNumber == 0)
+                _dataList.clear()
+            _dataList.addAll(data)
+
+            LoadResult.Page(
+                data = data,
+                prevKey = prevKey,
+                nextKey = nextKey
+            )
         } catch (e: IOException) {
             LoadResult.Error(e)
         } catch (e: HttpException)  {
             LoadResult.Error(e)
         }
-    }
-
-    fun addDataList(it: (List<ArticleEntity>) -> Unit): NewsDataSource {
-        it.invoke(dataList)
-        return this
     }
 }

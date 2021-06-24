@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.doOnLayout
+import androidx.core.view.doOnNextLayout
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.paging.LoadState
@@ -30,7 +33,6 @@ class ListNewsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        newsViewModel.rotate()
         setHasOptionsMenu(true)
     }
 
@@ -47,11 +49,9 @@ class ListNewsFragment : Fragment() {
                 setQuery("", false)
                 isIconified = true
             }
-            binding.recyclerViewListNews.visibility = View.GONE
+            binding.recyclerViewListNews.isVisible = false
         }
-
         setupRecyclerView()
-
         return binding.root
     }
 
@@ -61,13 +61,6 @@ class ListNewsFragment : Fragment() {
 
         val searchItem = menu.findItem(R.id.menu_item_search_news)
         searchView = searchItem.actionView as SearchView
-
-
-        fun onSearch(query: String) {
-            binding.textViewNothingFound.visibility = View.GONE
-            newsViewModel.filterNews(query)
-            activity?.hideKeyboard()
-        }
 
         searchView.apply {      // setting up searchView
             setQuery(newsViewModel.searchViewState.searchQuery, false)
@@ -88,7 +81,9 @@ class ListNewsFragment : Fragment() {
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     Log.i(TAG, "SearchView state: UNFOCUSED")
-                    onSearch(query ?: "")
+                    binding.textViewNothingFound.isVisible = false
+                    newsViewModel.filterNews(query ?: "")
+                    activity?.hideKeyboard()
                     return false
                 }
                 override fun onQueryTextChange(newText: String?): Boolean {
@@ -97,11 +92,10 @@ class ListNewsFragment : Fragment() {
                 }
             })
 
-
             setOnCloseListener {
                 Log.i(TAG, "SearchView state: CLOSED")
                 if (newsViewModel.recyclerViewState.state != NewsRecyclerViewState.State.FULL)
-                    newsViewModel.filterNews("")
+                    newsViewModel.restorePagingData()
                 false
             }
 
@@ -127,12 +121,12 @@ class ListNewsFragment : Fragment() {
         newsAdapter = NewsAdapter(layoutInflater)
         newsAdapter.addLoadStateListener {
             if (it.refresh == LoadState.Loading) {
-                binding.progressBarLoad.visibility = View.VISIBLE       // show pBar
-                binding.textViewNothingFound.visibility = View.GONE     // hide others
+                binding.progressBarLoad.isVisible = true       // show pBar
+                binding.textViewNothingFound.isVisible = false    // hide others
             } else {
                 binding.textViewNothingFound.isVisible = newsAdapter.itemCount == 0
-                binding.recyclerViewListNews.visibility = View.VISIBLE
-                binding.progressBarLoad.visibility = View.GONE
+                binding.recyclerViewListNews.isVisible = true
+                binding.progressBarLoad.isVisible = false
             }
         }
 
@@ -140,12 +134,12 @@ class ListNewsFragment : Fragment() {
             viewLifecycleOwner,
             {
                 it?.let {
-                    if (newsViewModel.recyclerViewState.state == NewsRecyclerViewState.State.FILTERED) {
-                        binding.textViewNothingFound.isVisible = newsViewModel.recyclerViewState.isEmpty
-                    }
+                    binding.textViewNothingFound.isVisible = newsViewModel.recyclerViewState.isEmpty
+
+                    val isEmpty = newsAdapter.itemCount == 0    // if it's not empty, scroll to top
                     newsAdapter.submitData(lifecycle, it)
-                    if (!newsViewModel.rotated) {
-                        binding.recyclerViewListNews.post {
+                    if (!isEmpty) {
+                        binding.recyclerViewListNews.doOnPreDraw {
                             binding.recyclerViewListNews.scrollToPosition(0)
                         }
                     }
