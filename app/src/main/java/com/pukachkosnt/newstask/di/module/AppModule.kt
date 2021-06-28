@@ -4,8 +4,7 @@ import com.pukachkosnt.data.api.NewsApi
 import com.pukachkosnt.data.api.NewsQueryInterceptor
 import com.pukachkosnt.data.repository.NewsFetchRepository
 import com.pukachkosnt.domain.repository.BaseRepository
-import com.pukachkosnt.newstask.NewsRecyclerViewState
-import com.pukachkosnt.newstask.SearchViewState
+import com.pukachkosnt.newstask.ui.SearchViewState
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.Interceptor
@@ -24,7 +23,6 @@ val appModule = module {
     single { provideRetrofit(get(), get()) }
     single { provideNewsApi(get()) }
     single { provideNewsRepository(get()) }
-    factory { provideRecyclerViewState() }
     factory { provideSearchViewState() }
 }
 
@@ -57,5 +55,3 @@ fun provideNewsRepository(api: NewsApi): BaseRepository {
 }
 
 fun provideSearchViewState() = SearchViewState()
-
-fun provideRecyclerViewState() = NewsRecyclerViewState()

@@ -16,11 +16,6 @@ class NewsDataSource(
     private val searchQuery: String,
     private val maxPages: Int
 ) : PagingSource<Int, ArticleEntity>() {
-
-    companion object {
-        private const val TAG = "NewsDataSource"
-    }
-
     private val _dataList: MutableList<ArticleEntity> = mutableListOf()
     val dataList: List<ArticleEntity> = _dataList
 
@@ -72,5 +67,9 @@ class NewsDataSource(
         } catch (e: HttpException)  {
             LoadResult.Error(e)
         }
+    }
+
+    companion object {
+        private const val TAG = "NewsDataSource"
     }
 }

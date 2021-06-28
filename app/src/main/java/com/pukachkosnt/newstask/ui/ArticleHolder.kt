@@ -1,5 +1,6 @@
-package com.pukachkosnt.newstask
+package com.pukachkosnt.newstask.ui
 
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -10,19 +11,10 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.pukachkosnt.newstask.animations.moveViewPosition
 import com.pukachkosnt.domain.models.ArticleEntity
+import com.pukachkosnt.newstask.R
 import com.squareup.picasso.Picasso
 
 class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    companion object {
-        private const val MAX_LINES_COLLAPSED = 3
-        private const val MAX_LINES_EXPANDED = 10
-        private const val TARGET_WIDTH = 370
-        private const val TARGET_HEIGHT = 160
-
-        private const val START_Y_POSITION = 0f
-        private const val SINGLE_LINE_HEIGHT = 29f
-    }
-
     private var showMoreState: Boolean = false  // false - not pressed, true - pressed
     private val textViewTitle: TextView = itemView.findViewById(R.id.text_view_article_title)
     private val imageView: ImageView = itemView.findViewById(R.id.image_view_article_img)
@@ -77,8 +69,8 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         textViewDescription.maxLines = MAX_LINES_EXPANDED
         moveViewPosition(
             linLayout,
-            -(textViewDescription.lineCount + 1) * SINGLE_LINE_HEIGHT,
-            -(textViewDescription.lineCount + 2) * SINGLE_LINE_HEIGHT
+            convertToPx(-(textViewDescription.lineCount + 1) * SINGLE_LINE_HEIGHT),
+            convertToPx(-(textViewDescription.lineCount + 2) * SINGLE_LINE_HEIGHT)
         )
         textViewTitle.isVisible = false
         textViewShowMore.setText(R.string.hide_more)
@@ -89,9 +81,28 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         moveViewPosition(
             linLayout,
             START_Y_POSITION,
-            -(textViewDescription.lineCount + 2) * SINGLE_LINE_HEIGHT
+            convertToPx( -(textViewDescription.lineCount + 2) * SINGLE_LINE_HEIGHT)
         )
         textViewTitle.isVisible = true
         textViewShowMore.setText(R.string.show_more)
+    }
+
+    private fun convertToPx(value: Float): Float {
+        val r = itemView.context.resources
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            value,
+            r.displayMetrics
+        )
+    }
+
+    companion object {
+        private const val MAX_LINES_COLLAPSED = 3
+        private const val MAX_LINES_EXPANDED = 10
+        private const val TARGET_WIDTH = 370
+        private const val TARGET_HEIGHT = 160
+
+        private const val START_Y_POSITION = 0f
+        private const val SINGLE_LINE_HEIGHT = 14.5f
     }
 }

@@ -1,4 +1,4 @@
-package com.pukachkosnt.newstask
+package com.pukachkosnt.newstask.ui
 
 data class SearchViewState (
     val searchQuery: String = "",

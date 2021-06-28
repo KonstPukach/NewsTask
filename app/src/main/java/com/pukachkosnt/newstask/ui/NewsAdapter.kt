@@ -1,10 +1,11 @@
-package com.pukachkosnt.newstask
+package com.pukachkosnt.newstask.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.pukachkosnt.domain.models.ArticleEntity
+import com.pukachkosnt.newstask.R
 
 class NewsAdapter(private val layoutInflater: LayoutInflater) :
     PagingDataAdapter<ArticleEntity, ArticleHolder>(ARTICLE_COMPARATOR) {

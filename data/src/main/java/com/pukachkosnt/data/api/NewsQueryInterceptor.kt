@@ -6,11 +6,6 @@ import okhttp3.Request
 import okhttp3.Response
 
 class NewsQueryInterceptor : Interceptor {
-    companion object {
-        private const val API_KEY = "f3841e980fca46f4b5a680b4f79c9d61"
-        private const val PAGE_SIZE = "100"
-    }
-
     override fun intercept(chain: Interceptor.Chain): Response {
         val request: Request = chain.request()
         val newUrl: HttpUrl = request.url().newBuilder()
@@ -22,5 +17,10 @@ class NewsQueryInterceptor : Interceptor {
             .url(newUrl)
             .build()
         return chain.proceed(newRequest)
+    }
+
+    companion object {
+        private const val API_KEY = "f3841e980fca46f4b5a680b4f79c9d61"
+        private const val PAGE_SIZE = "100"
     }
 }

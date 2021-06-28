@@ -1,7 +1,8 @@
-package com.pukachkosnt.newstask
+package com.pukachkosnt.newstask.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.pukachkosnt.newstask.R
 
 class NewsActivity : AppCompatActivity() {
 
