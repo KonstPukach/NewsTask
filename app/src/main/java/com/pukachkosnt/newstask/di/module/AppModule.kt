@@ -4,7 +4,7 @@ import com.pukachkosnt.data.api.NewsApi
 import com.pukachkosnt.data.api.NewsQueryInterceptor
 import com.pukachkosnt.data.repository.NewsFetchRepository
 import com.pukachkosnt.domain.repository.BaseRepository
-import com.pukachkosnt.newstask.ui.SearchViewState
+import com.pukachkosnt.newstask.ui.listnews.SearchViewState
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.Interceptor

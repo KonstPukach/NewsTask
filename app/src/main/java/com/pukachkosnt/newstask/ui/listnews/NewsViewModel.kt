@@ -1,29 +1,26 @@
-package com.pukachkosnt.newstask.ui
+package com.pukachkosnt.newstask.ui.listnews
 
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.pukachkosnt.domain.NewsDataSource
-import com.pukachkosnt.domain.models.ArticleEntity
+import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.domain.repository.BaseRepository
 
 class NewsViewModel(
     private val newsRepository: BaseRepository
 ) : ViewModel() {
-    lateinit var listState: ListState
-        private set
+    private val _newsItemsLiveData: MutableLiveData<ListState> = MutableLiveData()
+    val newsItemsLiveData: LiveData<ListState> = _newsItemsLiveData
 
-    private val _newsItemsLiveData: MediatorLiveData<PagingData<ArticleEntity>> = MediatorLiveData()
-    val newsItemsLiveData: LiveData<PagingData<ArticleEntity>> = _newsItemsLiveData
-
-    private var loadedDataList: List<ArticleEntity> = listOf()   // stores the full list of loaded data
+    private var loadedDataList: List<ArticleModel> = listOf()   // stores the full list of loaded data
 
     // paging liveData from Pager
-    private var pagerLiveData: LiveData<PagingData<ArticleEntity>> = MutableLiveData()
+    private var pagerLiveData: LiveData<PagingData<ArticleModel>> = MutableLiveData()
 
-    private var loadedPagingData: PagingData<ArticleEntity> = PagingData.empty()
+    private var loadedPagingData: PagingData<ArticleModel> = PagingData.empty()
 
-    private val pagerLiveDataObserver: Observer<PagingData<ArticleEntity>> = Observer {
-        _newsItemsLiveData.value = it
+    private val pagerLiveDataObserver: Observer<PagingData<ArticleModel>> = Observer {
+        _newsItemsLiveData.value = ListState.Full(it)
         loadedPagingData = it
     }
 
@@ -32,8 +29,6 @@ class NewsViewModel(
     }
 
     fun fetchNews() {
-        listState = ListState.Full(loadedPagingData)
-
         pagerLiveData.removeObserver(pagerLiveDataObserver)
 
         pagerLiveData = Pager(PagingConfig(PAGE_SIZE)) {
@@ -56,13 +51,12 @@ class NewsViewModel(
             it.title.contains(trimQuery, true)
         }
         val filteredPagingData = PagingData.from(list)
-        listState = ListState.Filtered(filteredPagingData, list.isEmpty())
-        _newsItemsLiveData.value = filteredPagingData
+        _newsItemsLiveData.value = ListState.Filtered(filteredPagingData, list.isEmpty())
     }
 
     fun clearFilter() {
-        listState = ListState.Full(loadedPagingData)
-        _newsItemsLiveData.value = loadedPagingData     // restore the full list of PagingData
+        _newsItemsLiveData.value =
+            ListState.Full(loadedPagingData) // restore the full list of PagingData
     }
 
     override fun onCleared() {

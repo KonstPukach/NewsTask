@@ -1,6 +1,6 @@
 package com.pukachkosnt.domain.repository
 
-import com.pukachkosnt.domain.models.ArticleEntity
+import com.pukachkosnt.domain.models.ArticleModel
 import java.util.*
 
 interface BaseRepository {
@@ -8,5 +8,5 @@ interface BaseRepository {
         dateStart: Date,
         dateFinish: Date,
         query: String = ""
-    ): List<ArticleEntity>
+    ): List<ArticleModel>
 }

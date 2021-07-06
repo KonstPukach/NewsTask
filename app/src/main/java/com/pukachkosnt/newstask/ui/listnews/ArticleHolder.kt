@@ -1,4 +1,4 @@
-package com.pukachkosnt.newstask.ui
+package com.pukachkosnt.newstask.ui.listnews
 
 import android.util.TypedValue
 import android.view.View
@@ -10,9 +10,11 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.pukachkosnt.newstask.animations.moveViewPosition
-import com.pukachkosnt.domain.models.ArticleEntity
+import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.newstask.R
+import com.pukachkosnt.newstask.extensions.toBeautifulLocalizedFormat
 import com.squareup.picasso.Picasso
+import java.util.*
 
 class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private var showMoreState: Boolean = false  // false - not pressed, true - pressed
@@ -21,6 +23,9 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val textViewDescription: TextView = itemView.findViewById(R.id.text_view_article_description)
     private val textViewShowMore: TextView = itemView.findViewById(R.id.text_view_show_more)
     private val linLayout: LinearLayout = itemView.findViewById(R.id.lin_layout_description)
+    private val textViewSource: TextView = itemView.findViewById(R.id.text_view_article_source)
+    private val textViewPublishedAt: TextView = itemView.findViewById(R.id.text_view_article_published_at)
+
 
     init {
         // set "show more" when layout parameters are known
@@ -36,11 +41,17 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
     }
 
-    fun bind(article: ArticleEntity) {
+    fun bind(article: ArticleModel) {
         initialSetupTranslation()
         showMoreState = false
         textViewTitle.text = article.title
         textViewDescription.text = article.description
+        textViewPublishedAt.text = article.publishedAt
+            .toBeautifulLocalizedFormat(
+                Locale.getDefault().language,
+                itemView.resources.getStringArray(R.array.months)
+            )
+        textViewSource.text = article.sourceName
 
         Picasso.get()
             .load(article.urlToImage)
@@ -49,6 +60,10 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             .resize(TARGET_WIDTH, TARGET_HEIGHT)
             .centerCrop()
             .into(imageView)
+
+        imageView.setOnClickListener {
+            (itemView.context as Callbacks).onArticleItemSelected(article.url)
+        }
     }
 
     private fun setupShowMore() {
@@ -94,6 +109,10 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             value,
             r.displayMetrics
         )
+    }
+
+    interface Callbacks {
+        fun onArticleItemSelected(url: String)
     }
 
     companion object {

@@ -1,11 +1,10 @@
-package com.pukachkosnt.newstask.ui
+package com.pukachkosnt.newstask.ui.listnews
 
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.pukachkosnt.newstask.R
@@ -13,7 +12,7 @@ import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class ListNewsFragment : Fragment() {
+class ListNewsFragment : BaseListNewsFragment() {
     private lateinit var binding: FragmentListNewsBinding
 
     private lateinit var newsAdapter: NewsAdapter
@@ -97,7 +96,8 @@ class ListNewsFragment : Fragment() {
             })
 
             setOnCloseListener {
-                if (newsViewModel.listState is ListState.Filtered)
+                updateSearchViewState(closed = true)
+                if (newsViewModel.newsItemsLiveData.value is ListState.Filtered)
                     newsViewModel.clearFilter()
                 false
             }
@@ -143,12 +143,12 @@ class ListNewsFragment : Fragment() {
             viewLifecycleOwner,
             {
                 it?.let {
-                    if (newsViewModel.listState is ListState.Filtered) {
+                    if (newsViewModel.newsItemsLiveData.value is ListState.Filtered) {
                         binding.textViewNothingFound.isVisible =
-                            (newsViewModel.listState as ListState.Filtered).isEmpty
+                            (newsViewModel.newsItemsLiveData.value as ListState.Filtered).isEmpty
                     }
                     val isEmpty = newsAdapter.itemCount == 0
-                    newsAdapter.submitData(lifecycle, it)
+                    newsAdapter.submitData(lifecycle, it.data)
 
                     // if it's not empty, scroll to top
                     if (!isEmpty) {
@@ -165,16 +165,24 @@ class ListNewsFragment : Fragment() {
 
     fun updateSearchViewState(
         hasFocus: Boolean? = null,
-        searchQuery: String? = null
+        searchQuery: String? = null,
+        closed: Boolean? = null
     ) {
         var state = searchViewState.state
         var query = searchViewState.searchQuery
+
+        closed?.let {
+            state = SearchViewState.State.CLOSED
+        }
 
         hasFocus?.let {
             state = if (it) {
                 SearchViewState.State.FOCUSED_WITH_KEYBOARD
             } else {
-                SearchViewState.State.UNFOCUSED
+                if (state != SearchViewState.State.CLOSED)
+                    SearchViewState.State.UNFOCUSED
+                else
+                    SearchViewState.State.CLOSED
             }
         }
         searchQuery?.let { query = it }

@@ -3,7 +3,7 @@ package com.pukachkosnt.domain
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.pukachkosnt.domain.models.ArticleEntity
+import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.domain.repository.BaseRepository
 import retrofit2.HttpException
 import java.io.IOException
@@ -15,18 +15,18 @@ class NewsDataSource(
     private val newsFetchRepository: BaseRepository,
     private val searchQuery: String,
     private val maxPages: Int
-) : PagingSource<Int, ArticleEntity>() {
-    private val _dataList: MutableList<ArticleEntity> = mutableListOf()
-    val dataList: List<ArticleEntity> = _dataList
+) : PagingSource<Int, ArticleModel>() {
+    private val _dataList: MutableList<ArticleModel> = mutableListOf()
+    val dataList: List<ArticleModel> = _dataList
 
-    override fun getRefreshKey(state: PagingState<Int, ArticleEntity>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, ArticleModel>): Int? {
         return state.anchorPosition?.let {
             state.closestPageToPosition(it)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(it)?.nextKey?.minus(1)
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ArticleEntity> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ArticleModel> {
         return try {
             val pageNumber = params.key ?: 0
 
@@ -45,7 +45,7 @@ class NewsDataSource(
             val calendarFinish = Calendar.getInstance().apply {
                 add(Calendar.DATE, - pageNumber)
             }
-            val data: List<ArticleEntity> = newsFetchRepository.fetchNewsWithTimeInterval(
+            val data: List<ArticleModel> = newsFetchRepository.fetchNewsWithTimeInterval(
                 calendarStart.time,
                 calendarFinish.time,
                 searchQuery

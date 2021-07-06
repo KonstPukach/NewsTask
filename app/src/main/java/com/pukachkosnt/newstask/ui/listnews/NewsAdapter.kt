@@ -1,14 +1,14 @@
-package com.pukachkosnt.newstask.ui
+package com.pukachkosnt.newstask.ui.listnews
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import com.pukachkosnt.domain.models.ArticleEntity
+import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.newstask.R
 
 class NewsAdapter(private val layoutInflater: LayoutInflater) :
-    PagingDataAdapter<ArticleEntity, ArticleHolder>(ARTICLE_COMPARATOR) {
+    PagingDataAdapter<ArticleModel, ArticleHolder>(ARTICLE_COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleHolder {
         val view = layoutInflater.inflate(R.layout.news_item, parent, false)
@@ -22,12 +22,12 @@ class NewsAdapter(private val layoutInflater: LayoutInflater) :
     }
 
     companion object {
-        private val ARTICLE_COMPARATOR = object : DiffUtil.ItemCallback<ArticleEntity>() {
-            override fun areItemsTheSame(oldItem: ArticleEntity, newItem: ArticleEntity): Boolean {
+        private val ARTICLE_COMPARATOR = object : DiffUtil.ItemCallback<ArticleModel>() {
+            override fun areItemsTheSame(oldItem: ArticleModel, newItem: ArticleModel): Boolean {
                 return oldItem.title == newItem.title
             }
 
-            override fun areContentsTheSame(oldItem: ArticleEntity, newItem: ArticleEntity): Boolean {
+            override fun areContentsTheSame(oldItem: ArticleModel, newItem: ArticleModel): Boolean {
                 return oldItem.title == newItem.title
             }
         }
