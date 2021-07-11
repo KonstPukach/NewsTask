@@ -1,30 +1,45 @@
-package com.pukachkosnt.newstask.ui.listnews
+package com.pukachkosnt.newstask.ui.listnews.all
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
-import androidx.paging.LoadState
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.fragment.app.setFragmentResultListener
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
+import com.pukachkosnt.newstask.extensions.convertToPx
+import com.pukachkosnt.newstask.ui.listnews.BaseListNewsFragment
+import com.pukachkosnt.newstask.ui.listnews.ListState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class ListNewsFragment : BaseListNewsFragment() {
-    private lateinit var binding: FragmentListNewsBinding
-
-    private lateinit var newsAdapter: NewsAdapter
-
     private lateinit var searchView: SearchView
 
-    private val newsViewModel: NewsViewModel by viewModel()
+    override val viewModel: NewsViewModel by viewModel()
 
     private lateinit var searchViewState: SearchViewState
 
+    private var callbacks: Callbacks? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setFragmentResultListener(F_RESULT_DELETED_ITEMS) { _, bundle ->
+            val deletedItemsSet: HashSet<Long> = bundle.getSerializable(KEY_DELETED_ITEMS) as HashSet<Long>
+            CoroutineScope(Dispatchers.IO).launch {
+                viewModel.refreshFavoriteArticles(deletedItemsSet)
+                CoroutineScope(Dispatchers.Main).launch {
+                    newsAdapter.notifyDataSetChanged()
+                }
+            }
+        }
 
         setHasOptionsMenu(true)
 
@@ -47,16 +62,17 @@ class ListNewsFragment : BaseListNewsFragment() {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentListNewsBinding.inflate(layoutInflater)
-
         binding.swipeRefreshListNews.setOnRefreshListener {       //  setup refreshing
-            newsViewModel.fetchNews()
+            viewModel.fetchNews()
             searchView.apply {
                 setQuery("", false)
                 isIconified = true
             }
             binding.swipeRefreshListNews.isRefreshing = false
         }
+
         setupRecyclerView()
+
         return binding.root
     }
 
@@ -64,8 +80,15 @@ class ListNewsFragment : BaseListNewsFragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_news_list, menu)
 
+        val favoritesItem = menu.findItem(R.id.menu_item_favorites)
+        favoritesItem.setOnMenuItemClickListener {
+            callbacks?.onFavoriteItemActionBarClicked()
+            true
+        }
+
         val searchItem = menu.findItem(R.id.menu_item_search_news)
         searchView = searchItem.actionView as SearchView
+        searchView.maxWidth = convertToPx(MAX_SEARCH_VIEW_WIDTH_DP, context?.resources).toInt()
 
         searchView.apply {      // setting up searchView
             setQuery(searchViewState.searchQuery, false)
@@ -85,7 +108,7 @@ class ListNewsFragment : BaseListNewsFragment() {
 
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
-                    newsViewModel.filterNews(query ?: "")
+                    viewModel.filterNews(query ?: "")
                     clearFocus()
                     return false
                 }
@@ -97,8 +120,8 @@ class ListNewsFragment : BaseListNewsFragment() {
 
             setOnCloseListener {
                 updateSearchViewState(closed = true)
-                if (newsViewModel.newsItemsLiveData.value is ListState.Filtered)
-                    newsViewModel.clearFilter()
+                if (viewModel.newsItemsLiveData.value is ListState.Filtered)
+                    viewModel.clearFilter()
                 false
             }
 
@@ -116,36 +139,25 @@ class ListNewsFragment : BaseListNewsFragment() {
         outState.putString(SAVED_SEARCH_QUERY_KEY, searchViewState.searchQuery)
     }
 
-    private fun setupRecyclerView() {
-        newsAdapter = NewsAdapter(layoutInflater)
-        newsAdapter.addLoadStateListener {
-            if (it.refresh == LoadState.Loading) {
-                binding.recyclerViewListNews.isVisible = false
-                binding.textViewNothingFound.isVisible = false
-                binding.progressBarLoad.isVisible = true       // show pBar
-            } else {
-                binding.textViewNothingFound.isVisible = newsAdapter.itemCount == 0
-                binding.recyclerViewListNews.isVisible = true
-                binding.progressBarLoad.isVisible = false
-            }
-        }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callbacks = context as Callbacks?
+    }
 
-        binding.recyclerViewListNews.apply {
-            layoutManager =  GridLayoutManager(
-                context,
-                resources.getInteger(R.integer.news_list_columns_count)
-            )
-            setHasFixedSize(true)
-            adapter = newsAdapter
-        }
+    override fun onDetach() {
+        super.onDetach()
+        callbacks = null
+    }
 
-        newsViewModel.newsItemsLiveData.observe(    // submit data to an adapter
+    override fun setupRecyclerView() {
+        super.setupRecyclerView()
+        viewModel.newsItemsLiveData.observe(    // submit data to an adapter
             viewLifecycleOwner,
             {
                 it?.let {
-                    if (newsViewModel.newsItemsLiveData.value is ListState.Filtered) {
+                    if (viewModel.newsItemsLiveData.value is ListState.Filtered) {
                         binding.textViewNothingFound.isVisible =
-                            (newsViewModel.newsItemsLiveData.value as ListState.Filtered).isEmpty
+                            (viewModel.newsItemsLiveData.value as ListState.Filtered).isEmpty
                     }
                     val isEmpty = newsAdapter.itemCount == 0
                     newsAdapter.submitData(lifecycle, it.data)
@@ -190,10 +202,19 @@ class ListNewsFragment : BaseListNewsFragment() {
         searchViewState = searchViewState.copy(state = state, searchQuery = query)
     }
 
+    interface Callbacks {
+        fun onFavoriteItemActionBarClicked()
+    }
+
     companion object {
         private const val TAG = "ListNewsFragment"
-        private const val SAVED_SEARCH_STATE_KEY: String = "SEARCH_VIEW_STATE"
-        private const val SAVED_SEARCH_QUERY_KEY: String = "SEARCH_VIEW_QUERY"
+        private const val SAVED_SEARCH_STATE_KEY = "SEARCH_VIEW_STATE"
+        private const val SAVED_SEARCH_QUERY_KEY = "SEARCH_VIEW_QUERY"
+
+        const val F_RESULT_DELETED_ITEMS = "F_RESULT_DELETED_ITEMS"
+        const val KEY_DELETED_ITEMS = "KEY_DELETED_ITEMS"
+
+        private const val MAX_SEARCH_VIEW_WIDTH_DP = 250f // dp
 
         fun newInstance() = ListNewsFragment()
     }

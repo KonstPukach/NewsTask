@@ -11,5 +11,7 @@ sealed class ListState {
         val isEmpty: Boolean
     ) : ListState()
 
-    data class Full(override val data: PagingData<ArticleModel>) : ListState()
+    data class Full(
+        override val data: PagingData<ArticleModel>
+    ) : ListState()
 }

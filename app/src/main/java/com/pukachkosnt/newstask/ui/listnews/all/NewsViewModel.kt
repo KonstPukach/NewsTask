@@ -1,23 +1,28 @@
-package com.pukachkosnt.newstask.ui.listnews
+package com.pukachkosnt.newstask.ui.listnews.all
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.pukachkosnt.domain.NewsDataSource
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.BaseRepository
+import com.pukachkosnt.domain.repository.BaseApiRepository
+import com.pukachkosnt.domain.repository.BaseDBRepository
+import com.pukachkosnt.newstask.ui.listnews.BaseNewsViewModel
+import com.pukachkosnt.newstask.ui.listnews.ListState
 
 class NewsViewModel(
-    private val newsRepository: BaseRepository
-) : ViewModel() {
+    private val apiRepository: BaseApiRepository,
+    private val dbRepository: BaseDBRepository
+) : BaseNewsViewModel(dbRepository) {
     private val _newsItemsLiveData: MutableLiveData<ListState> = MutableLiveData()
-    val newsItemsLiveData: LiveData<ListState> = _newsItemsLiveData
+    override val newsItemsLiveData: LiveData<ListState> = _newsItemsLiveData
 
     private var loadedDataList: List<ArticleModel> = listOf()   // stores the full list of loaded data
 
     // paging liveData from Pager
     private var pagerLiveData: LiveData<PagingData<ArticleModel>> = MutableLiveData()
-
-    private var loadedPagingData: PagingData<ArticleModel> = PagingData.empty()
 
     private val pagerLiveDataObserver: Observer<PagingData<ArticleModel>> = Observer {
         _newsItemsLiveData.value = ListState.Full(it)
@@ -33,7 +38,8 @@ class NewsViewModel(
 
         pagerLiveData = Pager(PagingConfig(PAGE_SIZE)) {
             NewsDataSource(     // set factory
-                newsRepository,
+                apiRepository,
+                dbRepository,
                 "",
                 MAX_PAGES
             ).also {
@@ -55,8 +61,16 @@ class NewsViewModel(
     }
 
     fun clearFilter() {
-        _newsItemsLiveData.value =
-            ListState.Full(loadedPagingData) // restore the full list of PagingData
+        // restores the full list of PagingData
+        _newsItemsLiveData.value = ListState.Full(loadedPagingData)
+    }
+
+    suspend fun refreshFavoriteArticles(deletedItemsSet: HashSet<Long>) {
+        loadedDataList.forEach {
+            if (deletedItemsSet.contains(it.publishedAt.time)) {
+                it.isFavorite = false
+            }
+        }
     }
 
     override fun onCleared() {

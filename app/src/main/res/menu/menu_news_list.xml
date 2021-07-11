@@ -6,4 +6,9 @@
         android:title="@string/search_news"
         app:showAsAction="ifRoom"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
+    <item
+        android:id="@+id/menu_item_favorites"
+        android:icon="@drawable/ic_menu_item_favorites"
+        android:title="@string/favorites"
+        app:showAsAction="always"/>
 </menu>

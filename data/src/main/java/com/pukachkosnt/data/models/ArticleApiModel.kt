@@ -5,7 +5,7 @@ import java.util.*
 
 // data layer
 
-data class Article (
+data class ArticleApiModel (
     @Json(name = "title") val title: String,
     @Json(name = "description") val description: String,
     @Json(name = "urlToImage") val urlToImage: String,

@@ -10,5 +10,6 @@ data class ArticleModel (
     val urlToImage: String,
     val publishedAt: Date,
     val sourceName: String,
-    val url: String
+    val url: String,
+    var isFavorite: Boolean = false
 )

@@ -7,6 +7,7 @@
     <string name="hide_more">...hide</string>
     <string name="nothing_found">Nothing found</string>
     <string name="retry">retry</string>
+    <string name="favorites">Favorites</string>
 
     <string-array name="months">
         <item>January</item>
