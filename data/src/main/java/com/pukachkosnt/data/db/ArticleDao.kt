@@ -1,6 +1,5 @@
 package com.pukachkosnt.data.db
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -17,6 +16,6 @@ interface ArticleDao {
     @Query("SELECT publishedAt FROM articles")
     suspend fun getTimesPublished(): List<Long>
 
-    @Query("SELECT * FROM articles ORDER BY id DESC")
-    fun getAllArticlesPaging(): PagingSource<Int, ArticleEntity>
+    @Query("SELECT * FROM articles ORDER BY id DESC LIMIT :begin, :end")
+    suspend fun getRangeOfArticles(begin: Int, end: Int): List<ArticleEntity>
 }

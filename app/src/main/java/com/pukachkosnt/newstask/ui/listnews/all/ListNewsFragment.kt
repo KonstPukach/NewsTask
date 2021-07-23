@@ -1,21 +1,18 @@
 package com.pukachkosnt.newstask.ui.listnews.all
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
-import com.pukachkosnt.newstask.extensions.convertToPx
 import com.pukachkosnt.newstask.ui.listnews.BaseListNewsFragment
 import com.pukachkosnt.newstask.ui.listnews.ListState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -28,17 +25,13 @@ class ListNewsFragment : BaseListNewsFragment() {
 
     private var callbacks: Callbacks? = null
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setFragmentResultListener(F_RESULT_DELETED_ITEMS) { _, bundle ->
             val deletedItemsSet: HashSet<Long> = bundle.getSerializable(KEY_DELETED_ITEMS) as HashSet<Long>
-            CoroutineScope(Dispatchers.IO).launch {
-                viewModel.refreshFavoriteArticles(deletedItemsSet)
-                CoroutineScope(Dispatchers.Main).launch {
-                    newsAdapter.notifyDataSetChanged()
-                }
-            }
+            viewModel.refreshFavoriteArticles(deletedItemsSet)
         }
 
         setHasOptionsMenu(true)
@@ -72,7 +65,6 @@ class ListNewsFragment : BaseListNewsFragment() {
         }
 
         setupRecyclerView()
-
         return binding.root
     }
 
@@ -88,7 +80,7 @@ class ListNewsFragment : BaseListNewsFragment() {
 
         val searchItem = menu.findItem(R.id.menu_item_search_news)
         searchView = searchItem.actionView as SearchView
-        searchView.maxWidth = convertToPx(MAX_SEARCH_VIEW_WIDTH_DP, context?.resources).toInt()
+       // searchView.maxWidth = convertToPx(MAX_SEARCH_VIEW_WIDTH_DP, context?.resources).toInt()
 
         searchView.apply {      // setting up searchView
             setQuery(searchViewState.searchQuery, false)
@@ -162,7 +154,7 @@ class ListNewsFragment : BaseListNewsFragment() {
                     val isEmpty = newsAdapter.itemCount == 0
                     newsAdapter.submitData(lifecycle, it.data)
 
-                    // if it's not empty, scroll to top
+                    // if adapter is not empty, scroll to top
                     if (!isEmpty) {
                         // Scroll to top on PreDraw event, because it is only way to detect
                         // if adapter has processed submitted data
@@ -214,7 +206,7 @@ class ListNewsFragment : BaseListNewsFragment() {
         const val F_RESULT_DELETED_ITEMS = "F_RESULT_DELETED_ITEMS"
         const val KEY_DELETED_ITEMS = "KEY_DELETED_ITEMS"
 
-        private const val MAX_SEARCH_VIEW_WIDTH_DP = 250f // dp
+        //private const val MAX_SEARCH_VIEW_WIDTH_DP = 250f // dp
 
         fun newInstance() = ListNewsFragment()
     }

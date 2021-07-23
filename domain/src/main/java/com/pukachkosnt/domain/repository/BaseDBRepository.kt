@@ -11,5 +11,5 @@ interface BaseDBRepository {
 
     suspend fun getTimesPublished(): List<Long>
 
-    suspend fun getAllArticlesFlow(): Flow<PagingData<ArticleModel>>
+    suspend fun getRangeFavoriteArticles(begin: Int, end: Int): List<ArticleModel>
 }

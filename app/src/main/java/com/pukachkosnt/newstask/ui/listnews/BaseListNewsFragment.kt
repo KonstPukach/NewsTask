@@ -24,15 +24,14 @@ abstract class BaseListNewsFragment : Fragment(), ArticleHolder.Callbacks {
     protected open fun setupRecyclerView() {
         newsAdapter = NewsAdapter(layoutInflater)
         newsAdapter.addLoadStateListener {
-            if (it.refresh == LoadState.Loading) {
-                binding.recyclerViewListNews.isVisible = false
-                binding.textViewNothingFound.isVisible = false
-                binding.progressBarLoad.isVisible = true       // show pBar
+            val isLoading = it.refresh == LoadState.Loading
+            binding.textViewNothingFound.isVisible = if (isLoading) {
+                false
             } else {
-                binding.textViewNothingFound.isVisible = newsAdapter.itemCount == 0
-                binding.recyclerViewListNews.isVisible = true
-                binding.progressBarLoad.isVisible = false
+                newsAdapter.itemCount == 0
             }
+            binding.recyclerViewListNews.isVisible = !isLoading
+            binding.progressBarLoad.isVisible = isLoading
         }
 
         binding.recyclerViewListNews.apply {

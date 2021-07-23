@@ -56,7 +56,7 @@ class FavoritesFragment : BaseListNewsFragment() {
         super.onStop()
         setFragmentResult(
             ListNewsFragment.F_RESULT_DELETED_ITEMS,
-            bundleOf(ListNewsFragment.KEY_DELETED_ITEMS to viewModel.fragmentResult)
+            bundleOf(ListNewsFragment.KEY_DELETED_ITEMS to viewModel.deletedItems)
         )
     }
 
