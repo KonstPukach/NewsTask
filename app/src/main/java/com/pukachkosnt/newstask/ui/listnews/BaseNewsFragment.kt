@@ -9,7 +9,7 @@ import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
 import kotlinx.coroutines.Deferred
 
-abstract class BaseListNewsFragment : Fragment(), ArticleHolder.Callbacks {
+abstract class BaseNewsFragment : Fragment(), ArticleHolder.Callbacks {
     protected abstract val viewModel: BaseNewsViewModel
     protected lateinit var binding: FragmentListNewsBinding
     protected lateinit var newsAdapter: NewsAdapter

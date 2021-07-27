@@ -4,12 +4,12 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.BaseDBRepository
+import com.pukachkosnt.domain.repository.FavoritesRepository
 import retrofit2.HttpException
 import java.io.IOException
 
 class FavoritesDataSource(
-    private val dbRepository: BaseDBRepository,
+    private val dbRepository: FavoritesRepository,
     private val pageSize: Int
 ) : PagingSource<Int, ArticleModel>() {
     override fun getRefreshKey(state: PagingState<Int, ArticleModel>): Int? {

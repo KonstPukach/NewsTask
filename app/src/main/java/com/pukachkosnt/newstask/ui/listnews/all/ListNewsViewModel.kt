@@ -4,16 +4,16 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.pukachkosnt.domain.NewsDataSource
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.BaseApiRepository
-import com.pukachkosnt.domain.repository.BaseDBRepository
+import com.pukachkosnt.domain.repository.NewsRepository
+import com.pukachkosnt.domain.repository.FavoritesRepository
 import com.pukachkosnt.newstask.ui.listnews.BaseNewsViewModel
 import com.pukachkosnt.newstask.ui.listnews.ListState
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 
-class NewsViewModel(
-    private val apiRepository: BaseApiRepository,
-    private val dbRepository: BaseDBRepository
+class ListNewsViewModel(
+    private val newsRepository: NewsRepository,
+    private val favoritesRepository: FavoritesRepository
 ) : BaseNewsViewModel() {
     private var loadedDataList: List<ArticleModel> = listOf() // stores the full list of loaded data
     private var currentlyShownPagingNews: PagingData<ArticleModel> = PagingData.empty()
@@ -27,8 +27,8 @@ class NewsViewModel(
 
         pagerLiveData = Pager(PagingConfig(PAGE_SIZE)) {
             NewsDataSource(     // set factory
-                apiRepository,
-                dbRepository,
+                newsRepository,
+                favoritesRepository,
                 MAX_PAGES
             ).also {
                 loadedDataList = it.dataList
@@ -57,16 +57,16 @@ class NewsViewModel(
     override fun addFavoriteArticleAsync(
         articleModel: ArticleModel
     ): Deferred<Result<ArticleModel>> {
-        return processFavoriteArticleAsync(articleModel, true)
+        return manageFavoriteArticlesAsync(articleModel, true)
     }
 
     override fun deleteFavoriteArticleAsync(
         articleModel: ArticleModel
     ): Deferred<Result<ArticleModel>> {
-        return processFavoriteArticleAsync(articleModel, false)
+        return manageFavoriteArticlesAsync(articleModel, false)
     }
 
-    private fun processFavoriteArticleAsync(
+    private fun manageFavoriteArticlesAsync(
         articleModel: ArticleModel,
         isFavorite: Boolean
     ): Deferred<Result<ArticleModel>> {
@@ -76,8 +76,8 @@ class NewsViewModel(
 
         return viewModelScope.async {
             val result =
-                if (isFavorite) { dbRepository.addArticle(articleModel) }
-                else { dbRepository.deleteArticle(articleModel) }
+                if (isFavorite) { favoritesRepository.addArticle(articleModel) }
+                else { favoritesRepository.deleteArticle(articleModel) }
 
             if (result.isSuccess) {
                 loadedPagingData = loadedPagingData.map { condition(it) }

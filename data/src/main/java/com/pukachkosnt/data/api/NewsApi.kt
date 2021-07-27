@@ -1,6 +1,6 @@
 package com.pukachkosnt.data.api
 
-import com.pukachkosnt.data.models.News
+import com.pukachkosnt.data.models.NewsApiModel
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -16,7 +16,7 @@ interface NewsApi {
         @Query("q") query: String = "",
         @Query("language") lang: String = LANG,
         @Query("domains") domains: String = DOMAIN
-    ): Response<News>
+    ): Response<NewsApiModel>
 
     companion object {
         private const val LANG = "ru"

@@ -1,17 +1,17 @@
 package com.pukachkosnt.data.repository
 
 import com.pukachkosnt.data.db.NewsDatabase
-import com.pukachkosnt.data.mapper.mapEntity
+import com.pukachkosnt.data.mapper.mapToEntity
 import com.pukachkosnt.data.mapper.mapToModel
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.BaseDBRepository
+import com.pukachkosnt.domain.repository.FavoritesRepository
 import java.io.IOException
 
 
-class NewsDBRepository(private val database: NewsDatabase) : BaseDBRepository {
+class NewsDBRepository(private val database: NewsDatabase) : FavoritesRepository {
     override suspend fun addArticle(articleModel: ArticleModel): Result<ArticleModel> {
         try {
-            database.articleDao().insertArticle(articleModel.mapEntity())
+            database.articleDao().insertArticle(articleModel.mapToEntity())
         } catch (e: IOException) {
             return Result.failure(e)
         }

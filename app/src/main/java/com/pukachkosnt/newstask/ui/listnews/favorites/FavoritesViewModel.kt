@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.pukachkosnt.domain.FavoritesDataSource
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.BaseDBRepository
+import com.pukachkosnt.domain.repository.FavoritesRepository
 import com.pukachkosnt.newstask.ui.listnews.BaseNewsViewModel
 import com.pukachkosnt.newstask.ui.listnews.ListState
 import kotlinx.coroutines.Deferred
@@ -12,7 +12,7 @@ import kotlinx.coroutines.async
 
 
 class FavoritesViewModel(
-    private val dbRepository: BaseDBRepository
+    private val favoritesRepository: FavoritesRepository
 ) : BaseNewsViewModel() {
     // fragment result is a set of removed items
     private val _deletedItems: HashSet<String> = hashSetOf()
@@ -26,7 +26,7 @@ class FavoritesViewModel(
         pagerLiveData.removeObserver(pagerLiveDataObserver)
 
         pagerLiveData = Pager(PagingConfig(PAGE_SIZE)) {
-            FavoritesDataSource(dbRepository, PAGE_SIZE)
+            FavoritesDataSource(favoritesRepository, PAGE_SIZE)
         }.liveData.cachedIn(viewModelScope)
 
         pagerLiveData.observeForever(pagerLiveDataObserver)
@@ -35,7 +35,7 @@ class FavoritesViewModel(
     override fun deleteFavoriteArticleAsync(
         articleModel: ArticleModel,
     ): Deferred<Result<ArticleModel>> {
-        return processFavoriteArticleAsync(
+        return manageFavoriteArticlesAsync(
             articleModel,
             false,
             _deletedItems::add
@@ -45,22 +45,22 @@ class FavoritesViewModel(
     override fun addFavoriteArticleAsync(
         articleModel: ArticleModel
     ): Deferred<Result<ArticleModel>> {
-        return processFavoriteArticleAsync(
+        return manageFavoriteArticlesAsync(
             articleModel,
             true,
             _deletedItems::remove
         )
     }
 
-    private fun processFavoriteArticleAsync(
+    private fun manageFavoriteArticlesAsync(
         articleModel: ArticleModel,
         isFavorite: Boolean,
         actionForSetOfRemovedItems: (String) -> Unit
     ): Deferred<Result<ArticleModel>> {
         return viewModelScope.async {
             val result =
-                if (isFavorite) { dbRepository.addArticle(articleModel) }
-                else { dbRepository.deleteArticle(articleModel) }
+                if (isFavorite) { favoritesRepository.addArticle(articleModel) }
+                else { favoritesRepository.deleteArticle(articleModel) }
 
             if (result.isSuccess) {
                 loadedPagingData = loadedPagingData.map {

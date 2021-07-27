@@ -18,7 +18,7 @@ fun ArticleApiModel.mapToModel(): ArticleModel {
     )
 }
 
-fun ArticleModel.mapEntity(): ArticleEntity {
+fun ArticleModel.mapToEntity(): ArticleEntity {
     return ArticleEntity(
         title = this.title,
         description = this.description,

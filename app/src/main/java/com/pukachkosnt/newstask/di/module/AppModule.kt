@@ -7,8 +7,8 @@ import com.pukachkosnt.data.api.NewsQueryInterceptor
 import com.pukachkosnt.data.db.NewsDatabase
 import com.pukachkosnt.data.repository.NewsApiRepository
 import com.pukachkosnt.data.repository.NewsDBRepository
-import com.pukachkosnt.domain.repository.BaseApiRepository
-import com.pukachkosnt.domain.repository.BaseDBRepository
+import com.pukachkosnt.domain.repository.NewsRepository
+import com.pukachkosnt.domain.repository.FavoritesRepository
 import com.pukachkosnt.newstask.ui.listnews.all.SearchViewState
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -58,7 +58,7 @@ fun provideNewsApi(retrofit: Retrofit): NewsApi {
     return retrofit.create(NewsApi::class.java)
 }
 
-fun provideNewsRepository(api: NewsApi): BaseApiRepository {
+fun provideNewsRepository(api: NewsApi): NewsRepository {
     return NewsApiRepository(api)
 }
 
@@ -72,6 +72,6 @@ fun provideNewsDatabase(context: Context): NewsDatabase {
     ).build()
 }
 
-fun provideDBRepository(database: NewsDatabase): BaseDBRepository {
+fun provideDBRepository(database: NewsDatabase): FavoritesRepository {
     return NewsDBRepository(database)
 }

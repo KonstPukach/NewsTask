@@ -2,11 +2,8 @@ package com.pukachkosnt.newstask.ui.listnews
 
 import androidx.lifecycle.*
 import androidx.paging.PagingData
-import androidx.paging.map
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.BaseDBRepository
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 
 
 abstract class BaseNewsViewModel : ViewModel() {

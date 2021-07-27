@@ -10,15 +10,15 @@ import androidx.fragment.app.setFragmentResultListener
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
 import com.pukachkosnt.newstask.extensions.convertToPx
-import com.pukachkosnt.newstask.ui.listnews.BaseListNewsFragment
+import com.pukachkosnt.newstask.ui.listnews.BaseNewsFragment
 import com.pukachkosnt.newstask.ui.listnews.ListState
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class ListNewsFragment : BaseListNewsFragment() {
+class ListNewsFragment : BaseNewsFragment() {
     private lateinit var searchView: SearchView
 
-    override val viewModel: NewsViewModel by viewModel()
+    override val viewModel: ListNewsViewModel by viewModel()
 
     private lateinit var searchViewState: SearchViewState
 

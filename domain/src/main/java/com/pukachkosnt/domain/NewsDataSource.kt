@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.BaseApiRepository
-import com.pukachkosnt.domain.repository.BaseDBRepository
+import com.pukachkosnt.domain.repository.NewsRepository
+import com.pukachkosnt.domain.repository.FavoritesRepository
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import retrofit2.HttpException
@@ -15,8 +15,8 @@ import java.util.*
 // Domain layer
 
 class NewsDataSource(
-    private val newsFetchRepository: BaseApiRepository,
-    private val dbRepository: BaseDBRepository,
+    private val newsFetchRepository: NewsRepository,
+    private val dbRepository: FavoritesRepository,
     private val maxPages: Int
 ) : PagingSource<Int, ArticleModel>() {
     private val _dataList: MutableList<ArticleModel> = mutableListOf()
