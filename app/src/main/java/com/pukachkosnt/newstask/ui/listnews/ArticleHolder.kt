@@ -2,6 +2,7 @@ package com.pukachkosnt.newstask.ui.listnews
 
 import android.net.Uri
 import android.view.View
+import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
@@ -16,7 +17,9 @@ import com.pukachkosnt.newstask.extensions.convertToPx
 import com.pukachkosnt.newstask.extensions.toBeautifulLocalizedFormat
 import com.pukachkosnt.newstask.ui.webdetails.WebActivity
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.*
 import java.util.*
+import kotlin.coroutines.coroutineContext
 
 class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val binding: NewsItemBinding = NewsItemBinding.bind(itemView)
@@ -75,14 +78,27 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             }
 
             imageBtnFavorite.setOnClickListener {
-                article.isFavorite = !article.isFavorite
-                imageBtnFavorite.background = if (article.isFavorite) {
-                    heartRedDrawable
-                } else {
-                    heartTransparentDrawable
+                CoroutineScope(Dispatchers.IO).launch {
+                    val result = callbacks.onFavoriteClickedAsync(
+                        article.copy(isFavorite = !article.isFavorite)
+                    ).await()
+                    withContext(Dispatchers.Main) {
+                        if (result.isSuccess) {
+                            imageBtnFavorite.background = if (!article.isFavorite) {
+                                heartRedDrawable
+                            } else {
+                                heartTransparentDrawable
+                            }
+                            scaleViewFromZero(it)
+                        } else {
+                            Toast.makeText(
+                                itemView.context,
+                                R.string.toast_article_not_added,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
                 }
-                scaleViewFromZero(it)
-                callbacks.onFavoriteClicked(article)
             }
         }
 
@@ -99,14 +115,15 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private fun setupShowMore() {
         with(binding) {
             if (textViewArticleDescription.width > 0) {
-                textViewShowMore.isVisible = textViewArticleDescription.lineCount > MAX_LINES_COLLAPSED
+                textViewShowMore.isVisible =
+                    textViewArticleDescription.lineCount > MAX_LINES_COLLAPSED
             }
         }
     }
 
-    private fun initialSetupTranslation() {     // every item need to be set up in onBind()
+    private fun initialSetupTranslation() {
         with(binding) {
-            linLayoutDescription.translationY = START_Y_POSITION   // because animation changes item's Y coordinate
+            linLayoutDescription.translationY = START_Y_POSITION
             textViewArticleDescription.maxLines = MAX_LINES_COLLAPSED
             textViewArticleTitle.isVisible = true
             textViewShowMore.isVisible = false
@@ -141,11 +158,10 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             textViewArticleTitle.isVisible = true
             textViewShowMore.setText(R.string.show_more)
         }
-
     }
 
     interface Callbacks {
-        fun onFavoriteClicked(article: ArticleModel)
+        fun onFavoriteClickedAsync(article: ArticleModel): Deferred<Result<ArticleModel>>
     }
 
     companion object {

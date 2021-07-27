@@ -10,12 +10,12 @@ interface ArticleDao {
     @Insert
     suspend fun insertArticle(articleEntity: ArticleEntity)
 
-    @Query("DELETE FROM articles WHERE publishedAt=:publishedAt")
-    suspend fun deleteArticle(publishedAt: Long)
+    @Query("DELETE FROM articles WHERE id=:id")
+    suspend fun deleteArticle(id: String)
 
-    @Query("SELECT publishedAt FROM articles")
-    suspend fun getTimesPublished(): List<Long>
+    @Query("SELECT id FROM articles")
+    suspend fun getIds(): List<String>
 
-    @Query("SELECT * FROM articles ORDER BY id DESC LIMIT :begin, :end")
+    @Query("SELECT * FROM articles ORDER BY timeAdded DESC LIMIT :begin, :end")
     suspend fun getRangeOfArticles(begin: Int, end: Int): List<ArticleEntity>
 }

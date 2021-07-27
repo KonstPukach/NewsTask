@@ -5,19 +5,30 @@ import com.pukachkosnt.data.mapper.mapEntity
 import com.pukachkosnt.data.mapper.mapToModel
 import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.domain.repository.BaseDBRepository
+import java.io.IOException
 
 
 class NewsDBRepository(private val database: NewsDatabase) : BaseDBRepository {
-    override suspend fun addArticle(articleModel: ArticleModel) {
-        database.articleDao().insertArticle(articleModel.mapEntity())
+    override suspend fun addArticle(articleModel: ArticleModel): Result<ArticleModel> {
+        try {
+            database.articleDao().insertArticle(articleModel.mapEntity())
+        } catch (e: IOException) {
+            return Result.failure(e)
+        }
+        return Result.success(articleModel)
     }
 
-    override suspend fun deleteArticle(articleModel: ArticleModel) {
-        database.articleDao().deleteArticle(articleModel.publishedAt.time)
+    override suspend fun deleteArticle(articleModel: ArticleModel): Result<ArticleModel> {
+        try {
+            database.articleDao().deleteArticle(articleModel.id)
+        } catch (e: IOException) {
+            return Result.failure(e)
+        }
+        return Result.success(articleModel)
     }
 
-    override suspend fun getTimesPublished(): List<Long> {
-        return database.articleDao().getTimesPublished()
+    override suspend fun getIds(): List<String> {
+        return database.articleDao().getIds()
     }
 
     override suspend fun getRangeFavoriteArticles(begin: Int, end: Int): List<ArticleModel> {
@@ -26,3 +37,4 @@ class NewsDBRepository(private val database: NewsDatabase) : BaseDBRepository {
         }
     }
 }
+

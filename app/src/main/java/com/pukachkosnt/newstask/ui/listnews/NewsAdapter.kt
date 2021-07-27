@@ -16,6 +16,13 @@ class NewsAdapter(private val layoutInflater: LayoutInflater) :
     }
 
     override fun onBindViewHolder(holder: ArticleHolder, position: Int) {
+    }
+    
+    override fun onBindViewHolder(
+        holder: ArticleHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         getItem(position)?.let {
             holder.bind(it)
         }
@@ -24,11 +31,15 @@ class NewsAdapter(private val layoutInflater: LayoutInflater) :
     companion object {
         private val ARTICLE_COMPARATOR = object : DiffUtil.ItemCallback<ArticleModel>() {
             override fun areItemsTheSame(oldItem: ArticleModel, newItem: ArticleModel): Boolean {
-                return oldItem.title == newItem.title
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(oldItem: ArticleModel, newItem: ArticleModel): Boolean {
-                return oldItem.title == newItem.title
+                return newItem == oldItem
+            }
+
+            override fun getChangePayload(oldItem: ArticleModel, newItem: ArticleModel): Any {
+                return listOf(newItem)
             }
         }
     }

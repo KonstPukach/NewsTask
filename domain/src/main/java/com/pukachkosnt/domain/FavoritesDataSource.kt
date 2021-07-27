@@ -12,10 +12,6 @@ class FavoritesDataSource(
     private val dbRepository: BaseDBRepository,
     private val pageSize: Int
 ) : PagingSource<Int, ArticleModel>() {
-
-    private val _dataList: MutableList<ArticleModel> = mutableListOf()
-    val dataList: List<ArticleModel> = _dataList
-
     override fun getRefreshKey(state: PagingState<Int, ArticleModel>): Int? {
         return state.anchorPosition?.let {
             state.closestPageToPosition(it)?.prevKey?.plus(1)
@@ -42,10 +38,6 @@ class FavoritesDataSource(
                     nextKey = null
                 )
             }
-
-            if (pageNumber == 0)
-                _dataList.clear()
-            _dataList.addAll(data)
 
             LoadResult.Page(
                 data = data,

@@ -8,6 +8,10 @@
     <string name="hide_more">...скрыть</string>
     <string name="nothing_found">Ничего не найдено</string>
     <string name="retry">заново</string>
+    <string name="favorites">Понравившиеся</string>
+    <string name="toast_article_not_added">
+        Что-то пошло не так. Новсть не добавлена в понравившиеся
+    </string>
 
     <string-array name="months">
         <item>Января</item>

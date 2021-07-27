@@ -5,18 +5,15 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.domain.repository.BaseDBRepository
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 
 
-abstract class BaseNewsViewModel(
-    private val dbRepository: BaseDBRepository
-) : ViewModel() {
+abstract class BaseNewsViewModel : ViewModel() {
     protected val _newsItemsLiveData: MutableLiveData<ListState> = MutableLiveData()
     val newsItemsLiveData: LiveData<ListState>
         get() = _newsItemsLiveData
     protected var loadedPagingData: PagingData<ArticleModel> = PagingData.empty()
-
-    protected var loadedDataList: List<ArticleModel> = listOf() // stores the full list of loaded data
 
     // paging liveData from Pager
     protected var pagerLiveData: LiveData<PagingData<ArticleModel>> = MutableLiveData()
@@ -26,15 +23,11 @@ abstract class BaseNewsViewModel(
         loadedPagingData = it
     }
 
-    open fun addFavoriteArticle(articleModel: ArticleModel) {
-        viewModelScope.launch {
-            dbRepository.addArticle(articleModel)
-        }
-    }
+    abstract fun addFavoriteArticleAsync(
+        articleModel: ArticleModel
+    ): Deferred<Result<ArticleModel>>
 
-    open fun deleteFavoriteArticle(articleModel: ArticleModel) {
-        viewModelScope.launch {
-            dbRepository.deleteArticle(articleModel)
-        }
-    }
+    abstract fun deleteFavoriteArticleAsync(
+        articleModel: ArticleModel
+    ): Deferred<Result<ArticleModel>>
 }
