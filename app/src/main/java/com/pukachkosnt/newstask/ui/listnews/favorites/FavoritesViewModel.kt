@@ -7,13 +7,11 @@ import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.domain.repository.FavoritesRepository
 import com.pukachkosnt.newstask.ui.listnews.BaseNewsViewModel
 import com.pukachkosnt.newstask.ui.listnews.ListState
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 
 
 class FavoritesViewModel(
     private val favoritesRepository: FavoritesRepository
-) : BaseNewsViewModel() {
+) : BaseNewsViewModel(favoritesRepository) {
     // fragment result is a set of removed items
     private val _deletedItems: HashSet<String> = hashSetOf()
     val deletedItems: Set<String> = _deletedItems
@@ -32,9 +30,9 @@ class FavoritesViewModel(
         pagerLiveData.observeForever(pagerLiveDataObserver)
     }
 
-    override fun deleteFavoriteArticleAsync(
+    override suspend fun deleteFavoriteArticleAsync(
         articleModel: ArticleModel,
-    ): Deferred<Result<ArticleModel>> {
+    ): Result<ArticleModel> {
         return manageFavoriteArticlesAsync(
             articleModel,
             false,
@@ -42,9 +40,9 @@ class FavoritesViewModel(
         )
     }
 
-    override fun addFavoriteArticleAsync(
+    override suspend fun addFavoriteArticleAsync(
         articleModel: ArticleModel
-    ): Deferred<Result<ArticleModel>> {
+    ): Result<ArticleModel> {
         return manageFavoriteArticlesAsync(
             articleModel,
             true,
@@ -52,29 +50,27 @@ class FavoritesViewModel(
         )
     }
 
-    private fun manageFavoriteArticlesAsync(
+    private suspend fun manageFavoriteArticlesAsync(
         articleModel: ArticleModel,
         isFavorite: Boolean,
         actionForSetOfRemovedItems: (String) -> Unit
-    ): Deferred<Result<ArticleModel>> {
-        return viewModelScope.async {
-            val result =
-                if (isFavorite) { favoritesRepository.addArticle(articleModel) }
-                else { favoritesRepository.deleteArticle(articleModel) }
+    ): Result<ArticleModel> {
+        val result =
+            if (isFavorite) { favoritesRepository.addArticle(articleModel) }
+            else { favoritesRepository.deleteArticle(articleModel) }
 
-            if (result.isSuccess) {
-                loadedPagingData = loadedPagingData.map {
-                    if (it.id == articleModel.id) {
-                        it.copy(isFavorite = isFavorite)
-                    } else {
-                        it
-                    }
+        if (result.isSuccess) {
+            loadedPagingData = loadedPagingData.map {
+                if (it.id == articleModel.id) {
+                    it.copy(isFavorite = isFavorite)
+                } else {
+                    it
                 }
-                _newsItemsLiveData.postValue(ListState.Full(loadedPagingData))
-                actionForSetOfRemovedItems(articleModel.id)
             }
-            result
+            _newsItemsLiveData.postValue(ListState.Full(loadedPagingData))
+            actionForSetOfRemovedItems(articleModel.id)
         }
+        return result
     }
 
     override fun onCleared() {

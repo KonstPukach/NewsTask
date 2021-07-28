@@ -4,19 +4,16 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.pukachkosnt.domain.NewsDataSource
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.NewsRepository
 import com.pukachkosnt.domain.repository.FavoritesRepository
+import com.pukachkosnt.domain.repository.NewsRepository
 import com.pukachkosnt.newstask.ui.listnews.BaseNewsViewModel
 import com.pukachkosnt.newstask.ui.listnews.ListState
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 
 class ListNewsViewModel(
     private val newsRepository: NewsRepository,
     private val favoritesRepository: FavoritesRepository
-) : BaseNewsViewModel() {
+) : BaseNewsViewModel(favoritesRepository) {
     private var loadedDataList: List<ArticleModel> = listOf() // stores the full list of loaded data
-    private var currentlyShownPagingNews: PagingData<ArticleModel> = PagingData.empty()
 
     init {
         fetchNews()
@@ -35,18 +32,19 @@ class ListNewsViewModel(
             }
         }.liveData.cachedIn(viewModelScope)
         pagerLiveData.observeForever(pagerLiveDataObserver)
-        currentlyShownPagingNews = loadedPagingData
     }
 
     fun filterNews(query: String) {
         val trimQuery = query.trim()
-        currentlyShownPagingNews = loadedPagingData.filter {
-            it.title.contains(trimQuery, true)
-        }
         val list = loadedDataList.filter {
             it.title.contains(trimQuery, true)
         }
-        _newsItemsLiveData.value = ListState.Filtered(currentlyShownPagingNews, list.isEmpty())
+        _newsItemsLiveData.value = ListState.Filtered(
+            loadedPagingData.filter {
+                it.title.contains(trimQuery, true)
+            },
+            list.isEmpty()
+        )
     }
 
     fun clearFilter() {
@@ -54,39 +52,41 @@ class ListNewsViewModel(
         _newsItemsLiveData.value = ListState.Full(loadedPagingData)
     }
 
-    override fun addFavoriteArticleAsync(
-        articleModel: ArticleModel
-    ): Deferred<Result<ArticleModel>> {
-        return manageFavoriteArticlesAsync(articleModel, true)
+    override suspend fun addFavoriteArticleAsync(articleModel: ArticleModel): Result<ArticleModel> {
+        val result = super.addFavoriteArticleAsync(articleModel)
+        manageFavoriteArticlesAsync(articleModel, result, true)
+        return result
     }
 
-    override fun deleteFavoriteArticleAsync(
-        articleModel: ArticleModel
-    ): Deferred<Result<ArticleModel>> {
-        return manageFavoriteArticlesAsync(articleModel, false)
+    override suspend fun deleteFavoriteArticleAsync(articleModel: ArticleModel): Result<ArticleModel> {
+        val result = super.deleteFavoriteArticleAsync(articleModel)
+        manageFavoriteArticlesAsync(articleModel, result, false)
+        return result
     }
 
     private fun manageFavoriteArticlesAsync(
         articleModel: ArticleModel,
+        result: Result<ArticleModel>,
         isFavorite: Boolean
-    ): Deferred<Result<ArticleModel>> {
+    ) {
         fun condition(it: ArticleModel): ArticleModel =
             if (it.id == articleModel.id) { it.copy(isFavorite = isFavorite) }
             else { it }
 
-        return viewModelScope.async {
-            val result =
-                if (isFavorite) { favoritesRepository.addArticle(articleModel) }
-                else { favoritesRepository.deleteArticle(articleModel) }
+        if (result.isSuccess) {
+            loadedPagingData = loadedPagingData.map { condition(it) }
 
-            if (result.isSuccess) {
-                loadedPagingData = loadedPagingData.map { condition(it) }
-                currentlyShownPagingNews = currentlyShownPagingNews.map { condition(it) }
-                _newsItemsLiveData.postValue(ListState.Full(currentlyShownPagingNews))
-            }
-            result
+            val tempPagingData = _newsItemsLiveData.value?.data?.map { condition(it) }
+                ?: PagingData.empty()
+
+            _newsItemsLiveData.postValue(
+                when (_newsItemsLiveData.value) {
+                    is ListState.Filtered -> ListState.Filtered(tempPagingData, false)
+                    else -> ListState.Full(tempPagingData)
+                }
+            )
         }
-    }
+     }
 
     fun refreshFavoriteArticles(deletedItemsSet: HashSet<String>) {
         fun condition(it: ArticleModel): ArticleModel =
@@ -94,10 +94,10 @@ class ListNewsViewModel(
             else { it }
 
         loadedPagingData = loadedPagingData.map { condition(it) }
-        currentlyShownPagingNews = currentlyShownPagingNews.map { condition(it) }
+        val tempPagingData = _newsItemsLiveData.value?.data?.map { condition(it) } ?: PagingData.empty()
         _newsItemsLiveData.value = when (_newsItemsLiveData.value) {
-            is ListState.Full -> ListState.Full(currentlyShownPagingNews)
-            else -> ListState.Filtered(currentlyShownPagingNews, false)
+            is ListState.Full -> ListState.Full(tempPagingData)
+            else -> ListState.Filtered(tempPagingData, false)
         }
     }
 

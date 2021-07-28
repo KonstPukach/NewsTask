@@ -2,7 +2,6 @@ package com.pukachkosnt.newstask.ui.listnews
 
 import android.net.Uri
 import android.view.View
-import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
@@ -17,9 +16,8 @@ import com.pukachkosnt.newstask.extensions.convertToPx
 import com.pukachkosnt.newstask.extensions.toBeautifulLocalizedFormat
 import com.pukachkosnt.newstask.ui.webdetails.WebActivity
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.*
 import java.util.*
-import kotlin.coroutines.coroutineContext
+
 
 class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val binding: NewsItemBinding = NewsItemBinding.bind(itemView)
@@ -78,27 +76,10 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             }
 
             imageBtnFavorite.setOnClickListener {
-                CoroutineScope(Dispatchers.IO).launch {
-                    val result = callbacks.onFavoriteClickedAsync(
-                        article.copy(isFavorite = !article.isFavorite)
-                    ).await()
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            imageBtnFavorite.background = if (!article.isFavorite) {
-                                heartRedDrawable
-                            } else {
-                                heartTransparentDrawable
-                            }
-                            scaleViewFromZero(it)
-                        } else {
-                            Toast.makeText(
-                                itemView.context,
-                                R.string.toast_article_not_added,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                }
+                callbacks.onFavoriteClickedAsync(
+                    article.copy(isFavorite = !article.isFavorite)
+                )
+                scaleViewFromZero(it)
             }
         }
 
@@ -161,7 +142,7 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     interface Callbacks {
-        fun onFavoriteClickedAsync(article: ArticleModel): Deferred<Result<ArticleModel>>
+        fun onFavoriteClickedAsync(article: ArticleModel)
     }
 
     companion object {
