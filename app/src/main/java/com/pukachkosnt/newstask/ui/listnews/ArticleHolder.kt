@@ -1,6 +1,5 @@
 package com.pukachkosnt.newstask.ui.listnews
 
-import android.net.Uri
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.doOnPreDraw
@@ -14,7 +13,6 @@ import com.pukachkosnt.newstask.animations.scaleViewFromZero
 import com.pukachkosnt.newstask.databinding.NewsItemBinding
 import com.pukachkosnt.newstask.extensions.convertToPx
 import com.pukachkosnt.newstask.extensions.toBeautifulLocalizedFormat
-import com.pukachkosnt.newstask.ui.webdetails.WebActivity
 import com.squareup.picasso.Picasso
 import java.util.*
 
@@ -71,19 +69,15 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             }
 
             imageViewArticleImg.setOnClickListener {
-                val intent = WebActivity.newIntent(itemView.context, Uri.parse(article.url))
-                (itemView.context as NewsActivity).startActivity(intent)
+                callbacks.onItemArticleClicked(article)
             }
 
             imageBtnFavorite.setOnClickListener {
-                callbacks.onFavoriteClickedAsync(
-                    article.copy(isFavorite = !article.isFavorite)
-                )
+                callbacks.onFavoriteClickedAsync(article)
                 scaleViewFromZero(it)
             }
         }
-
-
+        
         Picasso.get()
             .load(article.urlToImage)
             .placeholder(R.drawable.background_article)
@@ -143,6 +137,8 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     interface Callbacks {
         fun onFavoriteClickedAsync(article: ArticleModel)
+
+        fun onItemArticleClicked(article: ArticleModel)
     }
 
     companion object {

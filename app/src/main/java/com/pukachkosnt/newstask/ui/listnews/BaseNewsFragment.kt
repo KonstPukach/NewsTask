@@ -1,5 +1,6 @@
 package com.pukachkosnt.newstask.ui.listnews
 
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.view.isVisible
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
+import com.pukachkosnt.newstask.ui.webdetails.WebActivity
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 
@@ -23,20 +25,23 @@ abstract class BaseNewsFragment : Fragment(), ArticleHolder.Callbacks {
         super.onCreate(savedInstanceState)
 
         lifecycleScope.launch {
-            viewModel.addFavoritesState.collect {
-                if (it.isFailure) {
-                    Toast.makeText(
-                        context,
-                        R.string.toast_article_not_added,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+            viewModel.addFavoritesOnError.collect {
+                Toast.makeText(
+                    context,
+                    R.string.toast_article_not_added,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
     override fun onFavoriteClickedAsync(article: ArticleModel) {
         viewModel.onFavoriteClicked(article)
+    }
+
+    override fun onItemArticleClicked(article: ArticleModel) {
+        val intent = WebActivity.newIntent(requireContext(), Uri.parse(article.url))
+        (requireContext() as NewsActivity).startActivity(intent)
     }
 
     protected open fun setupRecyclerView() {

@@ -4,10 +4,9 @@ import androidx.lifecycle.*
 import androidx.paging.PagingData
 import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.domain.repository.FavoritesRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import java.io.IOException
 
 
 abstract class BaseNewsViewModel(
@@ -21,9 +20,9 @@ abstract class BaseNewsViewModel(
     // paging liveData from Pager
     protected var pagerLiveData: LiveData<PagingData<ArticleModel>> = MutableLiveData()
 
-    private val _addFavoritesState: MutableStateFlow<Result<ArticleModel?>> =
-        MutableStateFlow(Result.success(null))
-    val addFavoritesState: StateFlow<Result<ArticleModel?>> = _addFavoritesState
+    // emits Unit to do some action on add to favorites exception
+    private val _addFavoritesOnError: MutableSharedFlow<Unit> = MutableSharedFlow(0)
+    val addFavoritesOnError: SharedFlow<Unit> = _addFavoritesOnError
 
     protected val pagerLiveDataObserver: Observer<PagingData<ArticleModel>> = Observer {
         _newsItemsLiveData.value = ListState.Full(it)
@@ -44,14 +43,15 @@ abstract class BaseNewsViewModel(
 
     fun onFavoriteClicked(article: ArticleModel) {
         viewModelScope.launch {
-            val result = if (article.isFavorite) { addFavoriteArticleAsync(article) }
-            else { deleteFavoriteArticleAsync(article) }
+            val newArticle = article.copy(isFavorite = !article.isFavorite)
 
-            // need new instances to activate an observer
-            _addFavoritesState.value = result.fold(
-                { Result.success(article) },
-                { Result.failure(IOException()) }
-            )
+            val result =
+                if (newArticle.isFavorite) { addFavoriteArticleAsync(newArticle) }
+                else { deleteFavoriteArticleAsync(newArticle) }
+
+            if (result.isFailure) {
+                _addFavoritesOnError.emit(Unit)
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ class FavoritesDataSource(
                 Log.d(TAG, "End loading: $pageNumber")
                 return LoadResult.Page(
                     data = listOf(),
-                    prevKey = pageNumber - 1,
+                    prevKey = prevKey,
                     nextKey = null
                 )
             }

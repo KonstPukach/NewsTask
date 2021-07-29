@@ -16,13 +16,6 @@ class NewsAdapter(private val layoutInflater: LayoutInflater) :
     }
 
     override fun onBindViewHolder(holder: ArticleHolder, position: Int) {
-    }
-    
-    override fun onBindViewHolder(
-        holder: ArticleHolder,
-        position: Int,
-        payloads: MutableList<Any>
-    ) {
         getItem(position)?.let {
             holder.bind(it)
         }
