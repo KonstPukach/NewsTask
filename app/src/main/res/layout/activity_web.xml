@@ -6,5 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.webdetails.WebActivity">
-
+    <fragment
+        android:id="@+id/nav_host_web_fragment_container"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/web_nav_graph" />
 </FrameLayout>

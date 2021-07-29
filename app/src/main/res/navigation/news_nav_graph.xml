@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/news_nav_graph"
+    app:startDestination="@id/list_news_fragment">
+
+    <action
+        android:id="@+id/action_to_web_activity"
+        app:destination="@id/web_activity"/>
+
+    <fragment
+        android:id="@+id/list_news_fragment"
+        android:name="com.pukachkosnt.newstask.ui.listnews.all.ListNewsFragment"
+        android:label="list_news_fragment"
+        tools:layout="@layout/fragment_list_news">
+        <action
+            android:id="@+id/action_to_favorites_fragment"
+            app:destination="@id/favorites_fragment"
+            app:enterAnim="@anim/anim_slide_from_right"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/favorites_fragment"
+        android:name="com.pukachkosnt.newstask.ui.listnews.favorites.FavoritesFragment"
+        android:label="favorites_fragment"
+        tools:layout="@layout/fragment_favorites">
+        <action
+            android:id="@+id/action_to_list_news_fragment"
+            app:destination="@id/list_news_fragment" />
+    </fragment>
+
+    <activity
+        android:id="@+id/web_activity"
+        android:name="com.pukachkosnt.newstask.ui.webdetails.WebActivity"
+        android:label="web_activity"
+        tools:layout="@layout/activity_web">
+        <argument
+            android:name="param_url"
+            app:argType="string"
+            android:defaultValue=""/>
+    </activity>
+
+</navigation>

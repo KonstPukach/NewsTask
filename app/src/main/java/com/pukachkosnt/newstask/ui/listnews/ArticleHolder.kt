@@ -1,20 +1,21 @@
 package com.pukachkosnt.newstask.ui.listnews
 
-import android.net.Uri
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.pukachkosnt.domain.models.ArticleModel
+import com.pukachkosnt.newstask.NewsNavGraphDirections
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.animations.moveViewPosition
 import com.pukachkosnt.newstask.animations.scaleViewFromZero
 import com.pukachkosnt.newstask.databinding.NewsItemBinding
 import com.pukachkosnt.newstask.extensions.convertToPx
 import com.pukachkosnt.newstask.extensions.toBeautifulLocalizedFormat
-import com.pukachkosnt.newstask.ui.webdetails.WebActivity
 import com.squareup.picasso.Picasso
 import java.util.*
 
@@ -41,8 +42,11 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         // measures the view, when the view was drawn
         binding.textViewArticleDescription.doOnPreDraw { setupShowMore() }
 
-        callbacks = (itemView.context as NewsActivity)
-            .supportFragmentManager.findFragmentById(R.id.news_fragment_container) as Callbacks
+        callbacks = ((itemView.context as NewsActivity)
+            .supportFragmentManager
+            .findFragmentById(R.id.nav_host_list_news_fragment_container) as NavHostFragment)
+            .childFragmentManager
+            .fragments[0] as Callbacks
 
         binding.textViewShowMore.setOnClickListener {
             if (showMoreState) hideMore()
@@ -70,8 +74,8 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             }
 
             imageViewArticleImg.setOnClickListener {
-                val intent = WebActivity.newIntent(itemView.context, Uri.parse(article.url))
-                (itemView.context as NewsActivity).startActivity(intent)
+                val destination = NewsNavGraphDirections.actionToWebActivity(article.url)
+                itemView.findNavController().navigate(destination)
             }
 
             imageBtnFavorite.setOnClickListener {
@@ -141,7 +145,6 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             textViewArticleTitle.isVisible = true
             textViewShowMore.setText(R.string.show_more)
         }
-
     }
 
     interface Callbacks {
