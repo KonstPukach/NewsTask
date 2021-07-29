@@ -5,11 +5,9 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.newstask.NewsNavGraphDirections
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.animations.moveViewPosition
 import com.pukachkosnt.newstask.animations.scaleViewFromZero
@@ -74,8 +72,7 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             }
 
             imageViewArticleImg.setOnClickListener {
-                val destination = NewsNavGraphDirections.actionToWebActivity(article.url)
-                itemView.findNavController().navigate(destination)
+                callbacks.onItemArticleClicked(article)
             }
 
             imageBtnFavorite.setOnClickListener {
@@ -149,6 +146,8 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     interface Callbacks {
         fun onFavoriteClicked(article: ArticleModel)
+
+        fun onItemArticleClicked(article: ArticleModel)
     }
 
     companion object {
@@ -158,6 +157,6 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private const val TARGET_HEIGHT = 160
 
         private const val START_Y_POSITION = 0f
-        private const val SINGLE_LINE_HEIGHT = 14.5f
+        private const val SINGLE_LINE_HEIGHT = 14.8f
     }
 }

@@ -14,7 +14,6 @@ import com.pukachkosnt.newstask.ui.listnews.BaseListNewsFragment
 import com.pukachkosnt.newstask.ui.listnews.ListState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -215,7 +214,5 @@ class ListNewsFragment : BaseListNewsFragment() {
         const val KEY_DELETED_ITEMS = "KEY_DELETED_ITEMS"
 
         private const val MAX_SEARCH_VIEW_WIDTH_DP = 250f // dp
-
-        fun newInstance() = ListNewsFragment()
     }
 }

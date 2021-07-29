@@ -2,9 +2,12 @@ package com.pukachkosnt.newstask.ui.listnews
 
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.pukachkosnt.domain.models.ArticleModel
+import com.pukachkosnt.newstask.NewsNavGraphDirections
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
 
@@ -19,6 +22,11 @@ abstract class BaseListNewsFragment : Fragment(), ArticleHolder.Callbacks {
         } else {
             viewModel.deleteFavoriteArticle(article)
         }
+    }
+
+    override fun onItemArticleClicked(article: ArticleModel) {
+        val destination = NewsNavGraphDirections.actionToWebActivity(article.url)
+        findNavController().navigate(destination)
     }
 
     protected open fun setupRecyclerView() {

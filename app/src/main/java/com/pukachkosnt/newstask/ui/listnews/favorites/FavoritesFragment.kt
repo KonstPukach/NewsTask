@@ -59,8 +59,4 @@ class FavoritesFragment : BaseListNewsFragment() {
             bundleOf(ListNewsFragment.KEY_DELETED_ITEMS to viewModel.fragmentResult)
         )
     }
-
-    companion object {
-        fun newInstance() = FavoritesFragment()
-    }
 }

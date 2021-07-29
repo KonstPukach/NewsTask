@@ -9,7 +9,6 @@ import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.domain.repository.BaseDBRepository
 import com.pukachkosnt.newstask.ui.listnews.BaseNewsViewModel
 import com.pukachkosnt.newstask.ui.listnews.ListState
-import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
