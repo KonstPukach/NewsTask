@@ -73,7 +73,7 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             }
 
             imageBtnFavorite.setOnClickListener {
-                callbacks.onFavoriteClickedAsync(article)
+                callbacks.onFavoriteClicked(article)
                 scaleViewFromZero(it)
             }
         }
@@ -136,7 +136,7 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     interface Callbacks {
-        fun onFavoriteClickedAsync(article: ArticleModel)
+        fun onFavoriteClicked(article: ArticleModel)
 
         fun onItemArticleClicked(article: ArticleModel)
     }

@@ -30,10 +30,6 @@ class NewsAdapter(private val layoutInflater: LayoutInflater) :
             override fun areContentsTheSame(oldItem: ArticleModel, newItem: ArticleModel): Boolean {
                 return newItem == oldItem
             }
-
-            override fun getChangePayload(oldItem: ArticleModel, newItem: ArticleModel): Any {
-                return listOf(newItem)
-            }
         }
     }
 }

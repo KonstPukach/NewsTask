@@ -56,7 +56,12 @@ class FavoritesFragment : BaseNewsFragment() {
         super.onStop()
         setFragmentResult(
             ListNewsFragment.F_RESULT_DELETED_ITEMS,
-            bundleOf(ListNewsFragment.KEY_DELETED_ITEMS to viewModel.deletedItems)
+            Bundle().apply {
+                putStringArrayList(
+                    ListNewsFragment.KEY_DELETED_ITEMS,
+                    ArrayList(viewModel.deletedItems)
+                )
+            }
         )
     }
 

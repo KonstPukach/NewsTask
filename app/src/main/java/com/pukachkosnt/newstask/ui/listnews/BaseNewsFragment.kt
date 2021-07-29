@@ -35,7 +35,7 @@ abstract class BaseNewsFragment : Fragment(), ArticleHolder.Callbacks {
         }
     }
 
-    override fun onFavoriteClickedAsync(article: ArticleModel) {
+    override fun onFavoriteClicked(article: ArticleModel) {
         viewModel.onFavoriteClicked(article)
     }
 
@@ -58,6 +58,7 @@ abstract class BaseNewsFragment : Fragment(), ArticleHolder.Callbacks {
         }
 
         binding.recyclerViewListNews.apply {
+            itemAnimator = null
             layoutManager = GridLayoutManager(
                 context,
                 resources.getInteger(R.integer.news_list_columns_count)

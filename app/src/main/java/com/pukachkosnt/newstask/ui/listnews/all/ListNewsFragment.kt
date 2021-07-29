@@ -24,12 +24,12 @@ class ListNewsFragment : BaseNewsFragment() {
 
     private var callbacks: Callbacks? = null
 
-    @Suppress("UNCHECKED_CAST")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setFragmentResultListener(F_RESULT_DELETED_ITEMS) { _, bundle ->
-            val deletedItemsSet: HashSet<String> = bundle.getSerializable(KEY_DELETED_ITEMS) as HashSet<String>
+            val deletedItemsSet: HashSet<String> =
+                bundle.getStringArrayList(KEY_DELETED_ITEMS)?.toHashSet() ?: hashSetOf()
             viewModel.refreshFavoriteArticles(deletedItemsSet)
         }
 
