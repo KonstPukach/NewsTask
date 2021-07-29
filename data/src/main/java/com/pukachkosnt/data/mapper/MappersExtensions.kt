@@ -18,14 +18,15 @@ fun ArticleApiModel.mapToModel(): ArticleModel {
     )
 }
 
-fun ArticleModel.mapEntity(): ArticleEntity {
+fun ArticleModel.mapToEntity(): ArticleEntity {
     return ArticleEntity(
         title = this.title,
         description = this.description,
         urlToImage = this.urlToImage,
         publishedAt = this.publishedAt.time,
         sourceName = this.sourceName,
-        url = this.url
+        url = this.url,
+        id = this.id
     )
 }
 
@@ -37,6 +38,7 @@ fun ArticleEntity.mapToModel(): ArticleModel {
         publishedAt = Date(this.publishedAt),
         sourceName = this.sourceName,
         url = this.url,
-        isFavorite = true   // db articles are favorite by default
+        isFavorite = true,   // db articles are favorite by default
+        id = this.title + this.publishedAt + this.url
     )
 }

@@ -11,5 +11,6 @@ data class ArticleModel (
     val publishedAt: Date,
     val sourceName: String,
     val url: String,
-    var isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val id: String = title + publishedAt.time.toString() + url
 )

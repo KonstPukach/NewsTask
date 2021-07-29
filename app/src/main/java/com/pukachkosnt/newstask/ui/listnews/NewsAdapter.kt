@@ -27,11 +27,11 @@ class NewsAdapter(
     companion object {
         private val ARTICLE_COMPARATOR = object : DiffUtil.ItemCallback<ArticleModel>() {
             override fun areItemsTheSame(oldItem: ArticleModel, newItem: ArticleModel): Boolean {
-                return oldItem.title == newItem.title
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(oldItem: ArticleModel, newItem: ArticleModel): Boolean {
-                return oldItem.title == newItem.title
+                return newItem == oldItem
             }
         }
     }

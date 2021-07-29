@@ -4,6 +4,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.newstask.NewsNavGraphDirections
@@ -16,11 +17,7 @@ abstract class BaseListNewsFragment : Fragment(), ArticleHolder.Callbacks {
     protected lateinit var newsAdapter: NewsAdapter
 
     override fun onFavoriteClicked(article: ArticleModel) {
-        if (article.isFavorite) {
-            viewModel.addFavoriteArticle(article)
-        } else {
-            viewModel.deleteFavoriteArticle(article)
-        }
+        viewModel.onFavoriteClicked(article)
     }
 
     override fun onItemArticleClicked(article: ArticleModel) {
@@ -43,6 +40,9 @@ abstract class BaseListNewsFragment : Fragment(), ArticleHolder.Callbacks {
         }
 
         binding.recyclerViewListNews.apply {
+            itemAnimator = DefaultItemAnimator().apply {
+                supportsChangeAnimations = false
+            }
             layoutManager = GridLayoutManager(
                 context,
                 resources.getInteger(R.integer.news_list_columns_count)

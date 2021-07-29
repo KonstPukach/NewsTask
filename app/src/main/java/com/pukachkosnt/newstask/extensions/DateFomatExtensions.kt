@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 private const val MILLS_IN_HOUR = 3600000
-val sdf = SimpleDateFormat("MMM d',' h:mm a", Locale.UK)
+private val sdf = SimpleDateFormat("MMM d',' h:mm a", Locale.UK)
 
 fun Date.toBeautifulLocalizedFormat(location: String, months: Array<String>): String {
     val offset = TimeZone.getDefault().getOffset(this.time)

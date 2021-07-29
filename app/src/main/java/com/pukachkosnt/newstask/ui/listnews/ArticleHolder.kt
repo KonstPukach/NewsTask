@@ -16,6 +16,7 @@ import com.pukachkosnt.newstask.extensions.toBeautifulLocalizedFormat
 import com.squareup.picasso.Picasso
 import java.util.*
 
+
 class ArticleHolder(
     itemView: View,
     private val callbacks: Callbacks
@@ -70,18 +71,11 @@ class ArticleHolder(
             }
 
             imageBtnFavorite.setOnClickListener {
-                article.isFavorite = !article.isFavorite
-                imageBtnFavorite.background = if (article.isFavorite) {
-                    heartRedDrawable
-                } else {
-                    heartTransparentDrawable
-                }
-                scaleViewFromZero(it)
                 callbacks.onFavoriteClicked(article)
+                scaleViewFromZero(it)
             }
         }
-
-
+        
         Picasso.get()
             .load(article.urlToImage)
             .placeholder(R.drawable.background_article)
@@ -94,14 +88,15 @@ class ArticleHolder(
     private fun setupShowMore() {
         with(binding) {
             if (textViewArticleDescription.width > 0) {
-                textViewShowMore.isVisible = textViewArticleDescription.lineCount > MAX_LINES_COLLAPSED
+                textViewShowMore.isVisible =
+                    textViewArticleDescription.lineCount > MAX_LINES_COLLAPSED
             }
         }
     }
 
-    private fun initialSetupTranslation() {     // every item need to be set up in onBind()
+    private fun initialSetupTranslation() {
         with(binding) {
-            linLayoutDescription.translationY = START_Y_POSITION   // because animation changes item's Y coordinate
+            linLayoutDescription.translationY = START_Y_POSITION
             textViewArticleDescription.maxLines = MAX_LINES_COLLAPSED
             textViewArticleTitle.isVisible = true
             textViewShowMore.isVisible = false

@@ -3,13 +3,13 @@ package com.pukachkosnt.data.repository
 import com.pukachkosnt.data.api.NewsApi
 import com.pukachkosnt.data.mapper.mapToModel
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.BaseApiRepository
+import com.pukachkosnt.domain.repository.NewsRepository
 import java.text.SimpleDateFormat
 import java.util.*
 
 // Data layer. Repository receives data from a data source (network)
 
-class NewsApiRepository(private val newsApi: NewsApi) : BaseApiRepository {
+class NewsApiRepository(private val newsApi: NewsApi) : NewsRepository {
     override suspend fun fetchNewsWithTimeInterval(
         dateStart: Date,
         dateFinish: Date,
