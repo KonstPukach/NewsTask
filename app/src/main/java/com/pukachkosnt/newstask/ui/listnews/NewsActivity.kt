@@ -8,26 +8,26 @@ import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.ui.listnews.all.ListNewsFragment
 
 class NewsActivity : AppCompatActivity(), ListNewsFragment.Callbacks {
-    private var navHostFragment: NavHostFragment? = null
+    private lateinit var navHostFragment: NavHostFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news)
         navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_list_news_fragment_container) as NavHostFragment?
+            .findFragmentById(R.id.nav_host_list_news_fragment_container) as NavHostFragment
     }
 
     override fun onFavoriteItemActionBarClicked() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        navHostFragment?.navController?.navigate(R.id.action_to_favorites_fragment)
+        navHostFragment.navController.navigate(R.id.action_to_favorites_fragment)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                navHostFragment?.navController?.popBackStack()
+                navHostFragment.navController.popBackStack()
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
                 supportActionBar?.setDisplayShowHomeEnabled(false)
                 true

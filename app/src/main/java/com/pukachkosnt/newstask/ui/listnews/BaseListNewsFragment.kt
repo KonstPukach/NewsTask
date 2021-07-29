@@ -2,7 +2,6 @@ package com.pukachkosnt.newstask.ui.listnews
 
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
@@ -30,7 +29,7 @@ abstract class BaseListNewsFragment : Fragment(), ArticleHolder.Callbacks {
     }
 
     protected open fun setupRecyclerView() {
-        newsAdapter = NewsAdapter(layoutInflater)
+        newsAdapter = NewsAdapter(layoutInflater, this)
         newsAdapter.addLoadStateListener {
             if (it.refresh == LoadState.Loading) {
                 binding.recyclerViewListNews.isVisible = false

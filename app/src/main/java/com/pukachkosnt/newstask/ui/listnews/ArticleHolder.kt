@@ -5,7 +5,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.newstask.R
@@ -17,7 +16,10 @@ import com.pukachkosnt.newstask.extensions.toBeautifulLocalizedFormat
 import com.squareup.picasso.Picasso
 import java.util.*
 
-class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class ArticleHolder(
+    itemView: View,
+    private val callbacks: Callbacks
+) : RecyclerView.ViewHolder(itemView) {
     private val binding: NewsItemBinding = NewsItemBinding.bind(itemView)
     private var showMoreState: Boolean = false  // false - not pressed, true - pressed
 
@@ -31,20 +33,12 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         R.drawable.heart_transparent, null
     )
 
-    private val callbacks: Callbacks
-
     init {
         // set "show more" when layout parameters are known
         // measures view, when the text changes
         binding.textViewArticleDescription.doAfterTextChanged { setupShowMore() }
         // measures the view, when the view was drawn
         binding.textViewArticleDescription.doOnPreDraw { setupShowMore() }
-
-        callbacks = ((itemView.context as NewsActivity)
-            .supportFragmentManager
-            .findFragmentById(R.id.nav_host_list_news_fragment_container) as NavHostFragment)
-            .childFragmentManager
-            .fragments[0] as Callbacks
 
         binding.textViewShowMore.setOnClickListener {
             if (showMoreState) hideMore()
