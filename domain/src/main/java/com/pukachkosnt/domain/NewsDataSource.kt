@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.BaseApiRepository
-import com.pukachkosnt.domain.repository.BaseDBRepository
+import com.pukachkosnt.domain.repository.NewsRepository
+import com.pukachkosnt.domain.repository.FavoritesRepository
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import retrofit2.HttpException
@@ -15,16 +15,15 @@ import java.util.*
 // Domain layer
 
 class NewsDataSource(
-    private val newsFetchRepository: BaseApiRepository,
-    private val dbRepository: BaseDBRepository,
-    private val searchQuery: String,
+    private val newsFetchRepository: NewsRepository,
+    private val dbRepository: FavoritesRepository,
     private val maxPages: Int
 ) : PagingSource<Int, ArticleModel>() {
     private val _dataList: MutableList<ArticleModel> = mutableListOf()
     val dataList: List<ArticleModel> = _dataList
 
     private val favoriteArticlesJob = GlobalScope.async {
-        dbRepository.getTimesPublished().toHashSet()
+        dbRepository.getIds().toHashSet()
     }
 
     override fun getRefreshKey(state: PagingState<Int, ArticleModel>): Int? {
@@ -53,12 +52,13 @@ class NewsDataSource(
             val calendarFinish = Calendar.getInstance().apply {
                 add(Calendar.DATE, - pageNumber)
             }
-            val data: List<ArticleModel> = newsFetchRepository.fetchNewsWithTimeInterval(
-                calendarStart.time,
-                calendarFinish.time,
-                searchQuery
+            val data: List<ArticleModel> = favoritizeArticles(
+                favoriteArticlesJob.await(),
+                newsFetchRepository.fetchNewsWithTimeInterval(
+                    calendarStart.time,
+                    calendarFinish.time
+                )
             )
-            favoritizeArticles(favoriteArticlesJob.await(), data)
             val prevKey = if (pageNumber > 0) pageNumber - 1 else null
             val nextKey = if (data.isNotEmpty()) pageNumber + 1 else null
 
@@ -73,20 +73,24 @@ class NewsDataSource(
             )
         } catch (e: IOException) {
             LoadResult.Error(e)
-        } catch (e: HttpException)  {
+        } catch (e: HttpException) {
             LoadResult.Error(e)
         }
     }
 
     private fun favoritizeArticles(
-        favArticles: HashSet<Long>,
+        favArticles: HashSet<String>,
         allArticles: List<ArticleModel>
-    ) {
+    ) : List<ArticleModel> {
+        val resultList = mutableListOf<ArticleModel>()
         allArticles.forEach {
-            if (favArticles.contains(it.publishedAt.time)) {
-                it.isFavorite = true
+            if (favArticles.contains(it.id)) {
+                resultList.add(it.copy(isFavorite = true))
+            } else {
+                resultList.add(it)
             }
         }
+        return resultList
     }
 
     companion object {

@@ -1,6 +1,5 @@
 package com.pukachkosnt.newstask.ui.listnews
 
-import android.net.Uri
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.doOnPreDraw
@@ -14,9 +13,9 @@ import com.pukachkosnt.newstask.animations.scaleViewFromZero
 import com.pukachkosnt.newstask.databinding.NewsItemBinding
 import com.pukachkosnt.newstask.extensions.convertToPx
 import com.pukachkosnt.newstask.extensions.toBeautifulLocalizedFormat
-import com.pukachkosnt.newstask.ui.webdetails.WebActivity
 import com.squareup.picasso.Picasso
 import java.util.*
+
 
 class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val binding: NewsItemBinding = NewsItemBinding.bind(itemView)
@@ -70,23 +69,15 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             }
 
             imageViewArticleImg.setOnClickListener {
-                val intent = WebActivity.newIntent(itemView.context, Uri.parse(article.url))
-                (itemView.context as NewsActivity).startActivity(intent)
+                callbacks.onItemArticleClicked(article)
             }
 
             imageBtnFavorite.setOnClickListener {
-                article.isFavorite = !article.isFavorite
-                imageBtnFavorite.background = if (article.isFavorite) {
-                    heartRedDrawable
-                } else {
-                    heartTransparentDrawable
-                }
-                scaleViewFromZero(it)
                 callbacks.onFavoriteClicked(article)
+                scaleViewFromZero(it)
             }
         }
-
-
+        
         Picasso.get()
             .load(article.urlToImage)
             .placeholder(R.drawable.background_article)
@@ -99,14 +90,15 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private fun setupShowMore() {
         with(binding) {
             if (textViewArticleDescription.width > 0) {
-                textViewShowMore.isVisible = textViewArticleDescription.lineCount > MAX_LINES_COLLAPSED
+                textViewShowMore.isVisible =
+                    textViewArticleDescription.lineCount > MAX_LINES_COLLAPSED
             }
         }
     }
 
-    private fun initialSetupTranslation() {     // every item need to be set up in onBind()
+    private fun initialSetupTranslation() {
         with(binding) {
-            linLayoutDescription.translationY = START_Y_POSITION   // because animation changes item's Y coordinate
+            linLayoutDescription.translationY = START_Y_POSITION
             textViewArticleDescription.maxLines = MAX_LINES_COLLAPSED
             textViewArticleTitle.isVisible = true
             textViewShowMore.isVisible = false
@@ -141,11 +133,12 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             textViewArticleTitle.isVisible = true
             textViewShowMore.setText(R.string.show_more)
         }
-
     }
 
     interface Callbacks {
         fun onFavoriteClicked(article: ArticleModel)
+
+        fun onItemArticleClicked(article: ArticleModel)
     }
 
     companion object {

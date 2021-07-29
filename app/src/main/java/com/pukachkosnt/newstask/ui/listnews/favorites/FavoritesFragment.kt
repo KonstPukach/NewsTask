@@ -10,11 +10,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
-import com.pukachkosnt.newstask.ui.listnews.BaseListNewsFragment
+import com.pukachkosnt.newstask.ui.listnews.BaseNewsFragment
 import com.pukachkosnt.newstask.ui.listnews.all.ListNewsFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class FavoritesFragment : BaseListNewsFragment() {
+class FavoritesFragment : BaseNewsFragment() {
     override val viewModel: FavoritesViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,7 +28,7 @@ class FavoritesFragment : BaseListNewsFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_list_news, container, false)
         binding = FragmentListNewsBinding.bind(view)
@@ -56,7 +56,12 @@ class FavoritesFragment : BaseListNewsFragment() {
         super.onStop()
         setFragmentResult(
             ListNewsFragment.F_RESULT_DELETED_ITEMS,
-            bundleOf(ListNewsFragment.KEY_DELETED_ITEMS to viewModel.fragmentResult)
+            Bundle().apply {
+                putStringArrayList(
+                    ListNewsFragment.KEY_DELETED_ITEMS,
+                    ArrayList(viewModel.deletedItems)
+                )
+            }
         )
     }
 

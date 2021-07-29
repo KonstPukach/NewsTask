@@ -8,6 +8,7 @@
     <string name="nothing_found">Nothing found</string>
     <string name="retry">retry</string>
     <string name="favorites">Favorites</string>
+    <string name="toast_article_not_added">Something went wrong. The article is not added</string>
 
     <string-array name="months">
         <item>January</item>

@@ -1,38 +1,40 @@
 package com.pukachkosnt.data.repository
 
-import androidx.paging.*
 import com.pukachkosnt.data.db.NewsDatabase
-import com.pukachkosnt.data.mapper.mapEntity
+import com.pukachkosnt.data.mapper.mapToEntity
 import com.pukachkosnt.data.mapper.mapToModel
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.BaseDBRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import com.pukachkosnt.domain.repository.FavoritesRepository
+import java.io.IOException
 
-class NewsDBRepository(private val database: NewsDatabase) : BaseDBRepository {
-    override suspend fun addArticle(articleModel: ArticleModel) {
-        database.articleDao().insertArticle(articleModel.mapEntity())
+
+class NewsDBRepository(private val database: NewsDatabase) : FavoritesRepository {
+    override suspend fun addArticle(articleModel: ArticleModel): Result<ArticleModel> {
+        try {
+            database.articleDao().insertArticle(articleModel.mapToEntity())
+        } catch (e: IOException) {
+            return Result.failure(e)
+        }
+        return Result.success(articleModel)
     }
 
-    override suspend fun deleteArticle(articleModel: ArticleModel) {
-        database.articleDao().deleteArticle(articleModel.publishedAt.time)
+    override suspend fun deleteArticle(articleModel: ArticleModel): Result<ArticleModel> {
+        try {
+            database.articleDao().deleteArticle(articleModel.id)
+        } catch (e: IOException) {
+            return Result.failure(e)
+        }
+        return Result.success(articleModel)
     }
 
-    override suspend fun getTimesPublished(): List<Long> {
-        return database.articleDao().getTimesPublished()
+    override suspend fun getIds(): List<String> {
+        return database.articleDao().getIds()
     }
 
-    override suspend fun getAllArticlesFlow(): Flow<PagingData<ArticleModel>> {
-        return Pager(PagingConfig(PAGE_SIZE)) {
-            database.articleDao().getAllArticlesPaging()
-        }.flow.map {
-            it.map { entity ->
-                entity.mapToModel()
-            }
+    override suspend fun getRangeFavoriteArticles(begin: Int, end: Int): List<ArticleModel> {
+        return database.articleDao().getRangeOfArticles(begin, end).map {
+            it.mapToModel()
         }
     }
-
-    companion object {
-        private const val PAGE_SIZE = 50
-    }
 }
+

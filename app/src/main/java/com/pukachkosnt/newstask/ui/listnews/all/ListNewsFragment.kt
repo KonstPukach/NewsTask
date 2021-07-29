@@ -10,19 +10,15 @@ import androidx.fragment.app.setFragmentResultListener
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
 import com.pukachkosnt.newstask.extensions.convertToPx
-import com.pukachkosnt.newstask.ui.listnews.BaseListNewsFragment
+import com.pukachkosnt.newstask.ui.listnews.BaseNewsFragment
 import com.pukachkosnt.newstask.ui.listnews.ListState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class ListNewsFragment : BaseListNewsFragment() {
+class ListNewsFragment : BaseNewsFragment() {
     private lateinit var searchView: SearchView
 
-    override val viewModel: NewsViewModel by viewModel()
+    override val viewModel: ListNewsViewModel by viewModel()
 
     private lateinit var searchViewState: SearchViewState
 
@@ -32,13 +28,9 @@ class ListNewsFragment : BaseListNewsFragment() {
         super.onCreate(savedInstanceState)
 
         setFragmentResultListener(F_RESULT_DELETED_ITEMS) { _, bundle ->
-            val deletedItemsSet: HashSet<Long> = bundle.getSerializable(KEY_DELETED_ITEMS) as HashSet<Long>
-            CoroutineScope(Dispatchers.IO).launch {
-                viewModel.refreshFavoriteArticles(deletedItemsSet)
-                CoroutineScope(Dispatchers.Main).launch {
-                    newsAdapter.notifyDataSetChanged()
-                }
-            }
+            val deletedItemsSet: HashSet<String> =
+                bundle.getStringArrayList(KEY_DELETED_ITEMS)?.toHashSet() ?: hashSetOf()
+            viewModel.refreshFavoriteArticles(deletedItemsSet)
         }
 
         setHasOptionsMenu(true)
@@ -69,10 +61,10 @@ class ListNewsFragment : BaseListNewsFragment() {
                 isIconified = true
             }
             binding.swipeRefreshListNews.isRefreshing = false
+            scrollToTop()
         }
 
         setupRecyclerView()
-
         return binding.root
     }
 
@@ -109,6 +101,7 @@ class ListNewsFragment : BaseListNewsFragment() {
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     viewModel.filterNews(query ?: "")
+                    scrollToTop()
                     clearFocus()
                     return false
                 }
@@ -120,8 +113,10 @@ class ListNewsFragment : BaseListNewsFragment() {
 
             setOnCloseListener {
                 updateSearchViewState(closed = true)
-                if (viewModel.newsItemsLiveData.value is ListState.Filtered)
+                if (viewModel.newsItemsLiveData.value is ListState.Filtered) {
                     viewModel.clearFilter()
+                    scrollToTop()
+                }
                 false
             }
 
@@ -158,24 +153,16 @@ class ListNewsFragment : BaseListNewsFragment() {
                     if (viewModel.newsItemsLiveData.value is ListState.Filtered) {
                         binding.textViewNothingFound.isVisible =
                             (viewModel.newsItemsLiveData.value as ListState.Filtered).isEmpty
+                    } else {
+                        binding.textViewNothingFound.isVisible = false
                     }
-                    val isEmpty = newsAdapter.itemCount == 0
                     newsAdapter.submitData(lifecycle, it.data)
-
-                    // if it's not empty, scroll to top
-                    if (!isEmpty) {
-                        // Scroll to top on PreDraw event, because it is only way to detect
-                        // if adapter has processed submitted data
-                        binding.recyclerViewListNews.doOnPreDraw {
-                            binding.recyclerViewListNews.scrollToPosition(0)
-                        }
-                    }
                 }
             }
         )
     }
 
-    fun updateSearchViewState(
+    private fun updateSearchViewState(
         hasFocus: Boolean? = null,
         searchQuery: String? = null,
         closed: Boolean? = null
@@ -200,6 +187,13 @@ class ListNewsFragment : BaseListNewsFragment() {
         searchQuery?.let { query = it }
 
         searchViewState = searchViewState.copy(state = state, searchQuery = query)
+    }
+
+    private fun scrollToTop() {
+        // scroll to the top when recyclerView has received data
+        binding.recyclerViewListNews.doOnPreDraw {
+            binding.recyclerViewListNews.scrollToPosition(0)
+        }
     }
 
     interface Callbacks {

@@ -1,5 +1,5 @@
 package com.pukachkosnt.data.models
 
-data class Source (
+data class SourceApiModel (
     val name: String
 )

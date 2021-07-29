@@ -1,53 +1,84 @@
 package com.pukachkosnt.newstask.ui.listnews.favorites
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
-import androidx.paging.filter
+import androidx.paging.*
+import com.pukachkosnt.domain.FavoritesDataSource
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.BaseDBRepository
+import com.pukachkosnt.domain.repository.FavoritesRepository
 import com.pukachkosnt.newstask.ui.listnews.BaseNewsViewModel
 import com.pukachkosnt.newstask.ui.listnews.ListState
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+
 
 class FavoritesViewModel(
-    private val dbRepository: BaseDBRepository
-) : BaseNewsViewModel(dbRepository) {
-    private val _favoriteItemsLiveData: MutableLiveData<ListState> = MutableLiveData()
-    override val newsItemsLiveData: LiveData<ListState>
-        get() = _favoriteItemsLiveData
-
+    private val favoritesRepository: FavoritesRepository
+) : BaseNewsViewModel(favoritesRepository) {
     // fragment result is a set of removed items
-    private val _fragmentResult: HashSet<Long> = hashSetOf()
-    val fragmentResult: Set<Long> = _fragmentResult
+    private val _deletedItems: HashSet<String> = hashSetOf()
+    val deletedItems: Set<String> = _deletedItems
 
     init {
         fetchFavoriteArticles()
     }
 
     private fun fetchFavoriteArticles() {
-        viewModelScope.launch {
-            dbRepository.getAllArticlesFlow().cachedIn(viewModelScope).collect {
-                _favoriteItemsLiveData.postValue(ListState.Full(it))
-                loadedPagingData = it
-                cancel()    // executes once
-            }
-        }
+        pagerLiveData.removeObserver(pagerLiveDataObserver)
+
+        pagerLiveData = Pager(PagingConfig(PAGE_SIZE)) {
+            FavoritesDataSource(favoritesRepository, PAGE_SIZE)
+        }.liveData.cachedIn(viewModelScope)
+
+        pagerLiveData.observeForever(pagerLiveDataObserver)
     }
 
-    override fun deleteFavoriteArticle(articleModel: ArticleModel) {
-        viewModelScope.launch {
-            dbRepository.deleteArticle(articleModel)
-            // manually removes an item from the source data
-            loadedPagingData = loadedPagingData.filter {
-                it.isFavorite != articleModel.isFavorite
+    override suspend fun deleteFavoriteArticleAsync(
+        articleModel: ArticleModel,
+    ): Result<ArticleModel> {
+        return manageFavoriteArticlesAsync(
+            articleModel,
+            false,
+            _deletedItems::add
+        )
+    }
+
+    override suspend fun addFavoriteArticleAsync(
+        articleModel: ArticleModel
+    ): Result<ArticleModel> {
+        return manageFavoriteArticlesAsync(
+            articleModel,
+            true,
+            _deletedItems::remove
+        )
+    }
+
+    private suspend fun manageFavoriteArticlesAsync(
+        articleModel: ArticleModel,
+        isFavorite: Boolean,
+        actionForSetOfRemovedItems: (String) -> Unit
+    ): Result<ArticleModel> {
+        val result =
+            if (isFavorite) { favoritesRepository.addArticle(articleModel) }
+            else { favoritesRepository.deleteArticle(articleModel) }
+
+        if (result.isSuccess) {
+            loadedPagingData = loadedPagingData.map {
+                if (it.id == articleModel.id) {
+                    it.copy(isFavorite = isFavorite)
+                } else {
+                    it
+                }
             }
-            _favoriteItemsLiveData.postValue(ListState.Full(loadedPagingData))
-            _fragmentResult.add(articleModel.publishedAt.time)
+            _newsItemsLiveData.postValue(ListState.Full(loadedPagingData))
+            actionForSetOfRemovedItems(articleModel.id)
         }
+        return result
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        pagerLiveData.removeObserver(pagerLiveDataObserver)
+    }
+
+    companion object {
+        private const val PAGE_SIZE = 30
     }
 }
