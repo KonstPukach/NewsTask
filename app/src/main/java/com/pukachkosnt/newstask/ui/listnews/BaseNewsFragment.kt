@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.newstask.R
@@ -58,7 +59,9 @@ abstract class BaseNewsFragment : Fragment(), ArticleHolder.Callbacks {
         }
 
         binding.recyclerViewListNews.apply {
-            itemAnimator = null
+            itemAnimator = DefaultItemAnimator().apply {
+                supportsChangeAnimations = false
+            }
             layoutManager = GridLayoutManager(
                 context,
                 resources.getInteger(R.integer.news_list_columns_count)
