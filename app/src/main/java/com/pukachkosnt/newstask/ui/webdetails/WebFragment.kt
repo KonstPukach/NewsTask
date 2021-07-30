@@ -19,7 +19,7 @@ class WebFragment : Fragment() {
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
 
-    private val args by navArgs<WebFragmentArgs>()
+    private val args: WebFragmentArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,5 +52,9 @@ class WebFragment : Fragment() {
         webView.loadUrl(url)
 
         return view
+    }
+
+    companion object {
+        const val PARAM_URL = "param_url"
     }
 }
