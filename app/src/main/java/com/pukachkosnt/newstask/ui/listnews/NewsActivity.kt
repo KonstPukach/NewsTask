@@ -1,11 +1,12 @@
 package com.pukachkosnt.newstask.ui.listnews
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.ui.listnews.all.ListNewsFragment
 import com.pukachkosnt.newstask.ui.listnews.favorites.FavoritesFragment
+import com.pukachkosnt.newstask.ui.settings.SettingsFragment
 
 class NewsActivity : AppCompatActivity(), ListNewsFragment.Callbacks {
 
@@ -23,12 +24,17 @@ class NewsActivity : AppCompatActivity(), ListNewsFragment.Callbacks {
     }
 
     override fun onFavoriteItemActionBarClicked() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.news_fragment_container, FavoritesFragment.newInstance())
+            .addToBackStack(null)
+            .commit()
+    }
+
+    override fun onSettingsItemActionBarClicked() {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.news_fragment_container, SettingsFragment.newInstance())
             .addToBackStack(null)
             .commit()
     }

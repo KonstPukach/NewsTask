@@ -4,8 +4,9 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.pukachkosnt.domain.models.ArticleModel
-import com.pukachkosnt.domain.repository.NewsRepository
+import com.pukachkosnt.domain.repository.NewsByTimeIntervalRepository
 import com.pukachkosnt.domain.repository.FavoritesRepository
+import com.pukachkosnt.domain.repository.LastViewedArticleRepository
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import retrofit2.HttpException
@@ -15,8 +16,9 @@ import java.util.*
 // Domain layer
 
 class NewsDataSource(
-    private val newsFetchRepository: NewsRepository,
+    private val newsFetchByTimeIntervalRepository: NewsByTimeIntervalRepository,
     private val dbRepository: FavoritesRepository,
+    private val lastViewedArticleRepository: LastViewedArticleRepository,
     private val maxPages: Int
 ) : PagingSource<Int, ArticleModel>() {
     private val _dataList: MutableList<ArticleModel> = mutableListOf()
@@ -54,7 +56,7 @@ class NewsDataSource(
             }
             val data: List<ArticleModel> = favoritizeArticles(
                 favoriteArticlesJob.await(),
-                newsFetchRepository.fetchNewsWithTimeInterval(
+                newsFetchByTimeIntervalRepository.fetchNewsWithTimeInterval(
                     calendarStart.time,
                     calendarFinish.time
                 )
@@ -62,8 +64,11 @@ class NewsDataSource(
             val prevKey = if (pageNumber > 0) pageNumber - 1 else null
             val nextKey = if (data.isNotEmpty()) pageNumber + 1 else null
 
-            if (pageNumber == 0)
+            if (pageNumber == 0) {
                 _dataList.clear()
+                if (data.isNotEmpty())
+                    lastViewedArticleRepository.saveLastViewedArticleId(data.first().id)
+            }
             _dataList.addAll(data)
 
             LoadResult.Page(

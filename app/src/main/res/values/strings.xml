@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">NewsTask</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_news">Search news</string>
     <string name="show_more">...show more</string>
@@ -9,6 +8,8 @@
     <string name="retry">retry</string>
     <string name="favorites">Favorites</string>
     <string name="toast_article_not_added">Something went wrong. The article is not added</string>
+    <string name="settings">Settings</string>
+    <string name="notif_new_news">Read fresh news!</string>
 
     <string-array name="months">
         <item>January</item>

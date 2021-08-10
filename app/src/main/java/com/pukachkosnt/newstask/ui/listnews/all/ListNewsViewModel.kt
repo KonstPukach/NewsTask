@@ -5,13 +5,15 @@ import androidx.paging.*
 import com.pukachkosnt.domain.NewsDataSource
 import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.domain.repository.FavoritesRepository
-import com.pukachkosnt.domain.repository.NewsRepository
+import com.pukachkosnt.domain.repository.LastViewedArticleRepository
+import com.pukachkosnt.domain.repository.NewsByTimeIntervalRepository
 import com.pukachkosnt.newstask.ui.listnews.BaseNewsViewModel
 import com.pukachkosnt.newstask.ui.listnews.ListState
 
 class ListNewsViewModel(
-    private val newsRepository: NewsRepository,
-    private val favoritesRepository: FavoritesRepository
+    private val newsByTimeIntervalRepository: NewsByTimeIntervalRepository,
+    private val favoritesRepository: FavoritesRepository,
+    private val lastViewedArticleRepository: LastViewedArticleRepository
 ) : BaseNewsViewModel(favoritesRepository) {
     private var loadedDataList: List<ArticleModel> = listOf() // stores the full list of loaded data
 
@@ -24,8 +26,9 @@ class ListNewsViewModel(
 
         pagerLiveData = Pager(PagingConfig(PAGE_SIZE)) {
             NewsDataSource(     // set factory
-                newsRepository,
+                newsByTimeIntervalRepository,
                 favoritesRepository,
+                lastViewedArticleRepository,
                 MAX_PAGES
             ).also {
                 loadedDataList = it.dataList

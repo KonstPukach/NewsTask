@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_time_interval" translatable="false">notif_time_interval</string>
+    <string name="notifications_pref" translatable="false">notifications_pref</string>
+    <string name="time_interval_pref" translatable="false">time_interval_pref</string>
+    <string name="unique_notif_work_name" translatable="false">send_notification</string>
+</resources>
