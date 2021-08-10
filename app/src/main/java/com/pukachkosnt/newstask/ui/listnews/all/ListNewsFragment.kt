@@ -78,6 +78,12 @@ class ListNewsFragment : BaseNewsFragment() {
             true
         }
 
+        val settingsItem = menu.findItem(R.id.menu_item_settings)
+        settingsItem.setOnMenuItemClickListener {
+            callbacks?.onSettingsItemActionBarClicked()
+            true
+        }
+
         val searchItem = menu.findItem(R.id.menu_item_search_news)
         searchView = searchItem.actionView as SearchView
         searchView.maxWidth = convertToPx(MAX_SEARCH_VIEW_WIDTH_DP, context?.resources).toInt()
@@ -198,6 +204,8 @@ class ListNewsFragment : BaseNewsFragment() {
 
     interface Callbacks {
         fun onFavoriteItemActionBarClicked()
+
+        fun onSettingsItemActionBarClicked()
     }
 
     companion object {

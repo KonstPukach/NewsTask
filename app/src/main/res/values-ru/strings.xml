@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Новости</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_news">Искать</string>
     <string name="show_more">...читать далее</string>
@@ -12,6 +11,8 @@
     <string name="toast_article_not_added">
         Что-то пошло не так. Новость не добавлена в понравившиеся
     </string>
+    <string name="settings">Настройки</string>
+    <string name="notif_new_news">Читай новые новости!</string>
 
     <string-array name="months">
         <item>Января</item>

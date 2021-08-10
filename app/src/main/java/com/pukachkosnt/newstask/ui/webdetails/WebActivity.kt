@@ -3,8 +3,8 @@ package com.pukachkosnt.newstask.ui.webdetails
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.pukachkosnt.newstask.R
 
 class WebActivity : AppCompatActivity() {
@@ -37,5 +37,4 @@ class WebActivity : AppCompatActivity() {
             }
         }
     }
-
 }

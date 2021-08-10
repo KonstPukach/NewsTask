@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Notifications">
+        <SwitchPreferenceCompat
+            app:key="@string/notifications_pref"
+            app:title="Enable notifications"
+            android:defaultValue="true"/>
+
+        <SeekBarPreference
+            android:key="@string/time_interval_pref"
+            android:dependency="@string/notifications_pref"
+            android:title="Choose the time interval (minutes)"
+            app:showSeekBarValue="true"
+            app:min="15"
+            android:max="180"
+            android:defaultValue="15" />
+    </PreferenceCategory>
+</PreferenceScreen>
