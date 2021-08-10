@@ -1,10 +1,9 @@
 package com.pukachkosnt.newstask.ui.listnews
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.ui.listnews.all.ListNewsFragment
@@ -22,18 +21,17 @@ class NewsActivity : AppCompatActivity(), ListNewsFragment.Callbacks {
     }
 
     override fun onFavoriteItemActionBarClicked() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-
         navController.navigate(R.id.action_to_favorites_fragment)
+    }
+
+    override fun onSettingsItemActionBarClicked() {
+        navController.navigate(R.id.action_to_settings_fragment)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 navController.popBackStack()
-                supportActionBar?.setDisplayHomeAsUpEnabled(false)
-                supportActionBar?.setDisplayShowHomeEnabled(false)
                 true
             }
             else -> super.onOptionsItemSelected(item)

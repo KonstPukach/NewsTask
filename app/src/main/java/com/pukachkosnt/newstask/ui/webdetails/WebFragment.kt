@@ -53,8 +53,4 @@ class WebFragment : Fragment() {
 
         return view
     }
-
-    companion object {
-        const val PARAM_URL = "param_url"
-    }
 }

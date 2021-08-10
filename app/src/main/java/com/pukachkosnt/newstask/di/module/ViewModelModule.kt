@@ -7,7 +7,7 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel {
-        ListNewsViewModel(get(), get())
+        ListNewsViewModel(get(), get(), get())
     }
     viewModel {
         FavoritesViewModel(get())

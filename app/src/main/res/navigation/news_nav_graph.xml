@@ -18,7 +18,12 @@
             android:id="@+id/action_to_favorites_fragment"
             app:destination="@id/favorites_fragment"
             app:enterAnim="@anim/anim_slide_from_right"
-            app:popExitAnim="@android:anim/slide_out_right" />
+            app:popExitAnim="@anim/anim_slide_to_right" />
+        <action
+            android:id="@+id/action_to_settings_fragment"
+            app:destination="@id/settings_fragment"
+            app:enterAnim="@anim/anim_slide_from_right"
+            app:popExitAnim="@anim/anim_slide_to_right" />
     </fragment>
 
     <fragment
@@ -26,6 +31,16 @@
         android:name="com.pukachkosnt.newstask.ui.listnews.favorites.FavoritesFragment"
         android:label="favorites_fragment"
         tools:layout="@layout/fragment_favorites">
+        <action
+            android:id="@+id/action_to_list_news_fragment"
+            app:destination="@id/list_news_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settings_fragment"
+        android:name="com.pukachkosnt.newstask.ui.settings.SettingsFragment"
+        android:label="settings_fragment"
+        tools:layout="@xml/settings">
         <action
             android:id="@+id/action_to_list_news_fragment"
             app:destination="@id/list_news_fragment" />

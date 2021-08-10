@@ -2,7 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.pukachkosnt.newstask">
 
+    <permission
+        android:name="com.pukachkosnt.newstask.PRIVATE"
+        android:protectionLevel="signature" />
+
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.pukachkosnt.newstask.PRIVATE" />
 
     <application
         android:name=".App"
@@ -12,8 +17,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NewsTask">
-        <activity android:name=".ui.webdetails.WebActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"></activity>
+        <activity android:name=".ui.VisibleActivity"></activity>
+        <activity
+            android:name=".ui.webdetails.WebActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity android:name=".ui.listnews.NewsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,6 +28,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name="com.pukachkosnt.newstask.notifications.NotificationReceiver"
+            android:exported="false"
+            android:permission="com.pukachkosnt.newstask.PRIVATE">
+            <intent-filter>
+                <action android:name="com.pukachkosnt.newstask.SHOW_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

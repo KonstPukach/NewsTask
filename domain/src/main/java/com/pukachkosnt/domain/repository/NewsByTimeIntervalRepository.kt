@@ -3,7 +3,7 @@ package com.pukachkosnt.domain.repository
 import com.pukachkosnt.domain.models.ArticleModel
 import java.util.*
 
-interface NewsRepository {
+interface NewsByTimeIntervalRepository {
     suspend fun fetchNewsWithTimeInterval(
         dateStart: Date,
         dateFinish: Date,
