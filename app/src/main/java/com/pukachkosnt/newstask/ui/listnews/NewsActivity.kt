@@ -32,6 +32,8 @@ class NewsActivity : AppCompatActivity(), ListNewsFragment.Callbacks {
         return when (item.itemId) {
             android.R.id.home -> {
                 navController.popBackStack()
+                supportActionBar?.setDisplayHomeAsUpEnabled(false)
+                supportActionBar?.setDisplayShowHomeEnabled(false)
                 true
             }
             else -> super.onOptionsItemSelected(item)
