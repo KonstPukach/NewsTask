@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:paddingHorizontal="20dp">
+
+    <CheckedTextView
+        android:id="@+id/checked_text_view_option_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|center_vertical"
+        android:checkMark="?android:attr/textCheckMark"
+        android:checkMarkTint="@color/black"
+        android:textSize="20sp"
+        android:gravity="center"/>
+</FrameLayout>

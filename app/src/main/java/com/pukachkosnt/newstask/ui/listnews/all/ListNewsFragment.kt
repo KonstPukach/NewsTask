@@ -11,6 +11,8 @@ import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
 import com.pukachkosnt.newstask.extensions.convertToPx
 import com.pukachkosnt.newstask.ui.listnews.BaseListNewsFragment
+import com.pukachkosnt.newstask.ui.dialog.BottomSheetChooseFromListDialogFragment
+import com.pukachkosnt.newstask.ui.dialog.BottomSheetChooseFromListDialogFragment.Companion.CHOOSE_FROM_LIST_DIALOG_TAG
 import com.pukachkosnt.newstask.ui.listnews.ListState
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -62,6 +64,13 @@ class ListNewsFragment : BaseListNewsFragment() {
             }
             binding.swipeRefreshListNews.isRefreshing = false
             scrollToTop()
+        }
+
+        binding.btnSource.setOnClickListener {
+            BottomSheetChooseFromListDialogFragment().showNow(
+                parentFragmentManager,
+                CHOOSE_FROM_LIST_DIALOG_TAG
+            )
         }
 
         setupRecyclerView()

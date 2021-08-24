@@ -17,7 +17,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NewsTask">
-        <activity android:name=".ui.VisibleActivity"></activity>
         <activity
             android:name=".ui.webdetails.WebActivity"
             android:configChanges="orientation|screenSize|keyboardHidden" />
