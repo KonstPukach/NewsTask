@@ -10,12 +10,12 @@ import androidx.fragment.app.setFragmentResultListener
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
 import com.pukachkosnt.newstask.extensions.convertToPx
-import com.pukachkosnt.newstask.ui.listnews.BaseNewsFragment
+import com.pukachkosnt.newstask.ui.listnews.BaseListNewsFragment
 import com.pukachkosnt.newstask.ui.listnews.ListState
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class ListNewsFragment : BaseNewsFragment() {
+class ListNewsFragment : BaseListNewsFragment() {
     private lateinit var searchView: SearchView
 
     override val viewModel: ListNewsViewModel by viewModel()
@@ -217,7 +217,5 @@ class ListNewsFragment : BaseNewsFragment() {
         const val KEY_DELETED_ITEMS = "KEY_DELETED_ITEMS"
 
         private const val MAX_SEARCH_VIEW_WIDTH_DP = 250f // dp
-
-        fun newInstance() = ListNewsFragment()
     }
 }

@@ -17,7 +17,10 @@ import com.squareup.picasso.Picasso
 import java.util.*
 
 
-class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class ArticleHolder(
+    itemView: View,
+    private val callbacks: Callbacks
+) : RecyclerView.ViewHolder(itemView) {
     private val binding: NewsItemBinding = NewsItemBinding.bind(itemView)
     private var showMoreState: Boolean = false  // false - not pressed, true - pressed
 
@@ -31,17 +34,12 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         R.drawable.heart_transparent, null
     )
 
-    private val callbacks: Callbacks
-
     init {
         // set "show more" when layout parameters are known
         // measures view, when the text changes
         binding.textViewArticleDescription.doAfterTextChanged { setupShowMore() }
         // measures the view, when the view was drawn
         binding.textViewArticleDescription.doOnPreDraw { setupShowMore() }
-
-        callbacks = (itemView.context as NewsActivity)
-            .supportFragmentManager.findFragmentById(R.id.news_fragment_container) as Callbacks
 
         binding.textViewShowMore.setOnClickListener {
             if (showMoreState) hideMore()
@@ -148,6 +146,6 @@ class ArticleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private const val TARGET_HEIGHT = 160
 
         private const val START_Y_POSITION = 0f
-        private const val SINGLE_LINE_HEIGHT = 14.5f
+        private const val SINGLE_LINE_HEIGHT = 14.8f
     }
 }

@@ -62,7 +62,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     companion object {
-        fun newInstance() = SettingsFragment()
         private const val MILLS_IN_MINUTE = 1000 * 60L
         private const val TAG = "SettingsFragment"
 

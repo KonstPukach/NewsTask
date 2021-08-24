@@ -1,9 +1,7 @@
 package com.pukachkosnt.newstask.ui.webdetails
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,19 +10,20 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
 import com.pukachkosnt.newstask.R
 
-
 class WebFragment : Fragment() {
-    private lateinit var uri: Uri
+    private lateinit var url: String
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
 
+    private val args: WebFragmentArgs by navArgs()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            uri = arguments?.getParcelable(ARG_URI) ?: Uri.EMPTY
-        }
+        url = args.paramUrl
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -32,7 +31,6 @@ class WebFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view =  inflater.inflate(R.layout.fragment_web, container, false)
 
         webView = view.findViewById(R.id.web_view_article_details)
@@ -51,19 +49,8 @@ class WebFragment : Fragment() {
         }
 
         webView.webViewClient = WebViewClient()
-        webView.loadUrl(uri.toString())
+        webView.loadUrl(url)
 
         return view
-    }
-
-    companion object {
-        private const val ARG_URI = "param_uri"
-
-        fun newInstance(uri: Uri) =
-            WebFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(ARG_URI, uri)
-                }
-            }
     }
 }

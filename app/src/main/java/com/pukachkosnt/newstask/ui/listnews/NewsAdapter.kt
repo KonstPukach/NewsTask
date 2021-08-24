@@ -7,12 +7,15 @@ import androidx.recyclerview.widget.DiffUtil
 import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.newstask.R
 
-class NewsAdapter(private val layoutInflater: LayoutInflater) :
+class NewsAdapter(
+    private val layoutInflater: LayoutInflater,
+    private val callbacks: ArticleHolder.Callbacks
+) :
     PagingDataAdapter<ArticleModel, ArticleHolder>(ARTICLE_COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleHolder {
         val view = layoutInflater.inflate(R.layout.news_item, parent, false)
-        return ArticleHolder(view)
+        return ArticleHolder(view, callbacks)
     }
 
     override fun onBindViewHolder(holder: ArticleHolder, position: Int) {
