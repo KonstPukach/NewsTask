@@ -21,6 +21,20 @@ abstract class BaseListNewsFragment : Fragment(), ArticleHolder.Callbacks {
     protected lateinit var binding: FragmentListNewsBinding
     protected lateinit var newsAdapter: NewsAdapter
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        lifecycleScope.launch {
+            viewModel.addFavoritesOnError.collect {
+                Toast.makeText(
+                    context,
+                    R.string.toast_article_not_added,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
     override fun onFavoriteClicked(article: ArticleModel) {
         viewModel.onFavoriteClicked(article)
     }

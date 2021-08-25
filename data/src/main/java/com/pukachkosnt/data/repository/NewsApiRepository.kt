@@ -19,10 +19,13 @@ class NewsApiRepository(private val newsApi: NewsApi)
         query: String
     ): List<ArticleModel> {
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ROOT)
+        val sourcesString =
+            if (source.isNotEmpty()) source.joinToString(",")
+            else NewsApi.DEFAULT_SOURCE
         val response = newsApi.fetchNewsAsync(
             dateFrom = sdf.format(dateStart),
             dateTo = sdf.format(dateFinish),
-            source = source.joinToString(","),
+            source = sourcesString,
             query = query
         )
         // map ArticleApiModel to ArticleModel

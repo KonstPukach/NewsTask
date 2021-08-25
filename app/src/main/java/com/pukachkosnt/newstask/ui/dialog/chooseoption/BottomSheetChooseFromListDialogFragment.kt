@@ -48,6 +48,7 @@ abstract class BottomSheetChooseFromListDialogFragment<T : Option>
         super.onStart()
         val behavior = BottomSheetBehavior.from(requireView().parent as View)
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        behavior.skipCollapsed = true
     }
 
     override fun onChooseOption(option: T, isChecked: Boolean) {

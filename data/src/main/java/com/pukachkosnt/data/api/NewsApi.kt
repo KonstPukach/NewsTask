@@ -15,7 +15,7 @@ interface NewsApi {
         @Query("from") dateFrom: String = "",
         @Query("to") dateTo: String = "",
         @Query("q") query: String = "",
-        @Query("sources") source: String = SOURCE,
+        @Query("sources") source: String = DEFAULT_SOURCE,
         @Query("pageSize") pageSize: String = PAGE_SIZE
     ): Response<NewsApiModel>
 
@@ -23,7 +23,7 @@ interface NewsApi {
     suspend fun fetchSourcesAsync(): Response<SourcesApiModel>
 
     companion object {
-        private const val SOURCE = "bbc-news"
+        const val DEFAULT_SOURCE = "bbc-news"
         private const val PAGE_SIZE = "100"
     }
 }
