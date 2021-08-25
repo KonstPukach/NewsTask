@@ -1,4 +1,4 @@
-package com.pukachkosnt.newstask.ui.dialog
+package com.pukachkosnt.newstask.ui.dialog.choosesource
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -23,13 +23,22 @@ class ChooseSourceViewModel(
         }
     }
 
-    fun saveFavSources() {
+    fun saveFavSources(): Boolean {
+        var isDifferent = false
+        val startingSources: Set<String> = sourcesIdsRepository.getNewsSources()
         val sourcesToSave: MutableSet<String> = mutableSetOf()
         _listOptions.value?.forEach {
-            if (it.checked)
+            if (it.checked) {
                 sourcesToSave.add(it.id)
+                if (!startingSources.contains(it.id)) {
+                    isDifferent = true
+                }
+            }
         }
-        sourcesIdsRepository.saveNewsSources(sourcesToSave)
+        isDifferent = isDifferent || startingSources.size != sourcesToSave.size
+        if (isDifferent)
+            sourcesIdsRepository.saveNewsSources(sourcesToSave)
+        return isDifferent
     }
 
     override fun refreshSources(option: Source) {

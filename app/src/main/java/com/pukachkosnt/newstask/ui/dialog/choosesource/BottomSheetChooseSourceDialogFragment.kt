@@ -1,4 +1,4 @@
-package com.pukachkosnt.newstask.ui.dialog
+package com.pukachkosnt.newstask.ui.dialog.choosesource
 
 import android.os.Bundle
 import android.view.View
@@ -15,8 +15,8 @@ class BottomSheetChooseSourceDialogFragment : BottomSheetChooseFromListDialogFra
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.imgBtnSaveSources.setOnClickListener {
-            viewModel.saveFavSources()
-            closeType = CloseType.SAVE
+            if (viewModel.saveFavSources())
+                closeType = CloseType.SAVE
             this.dismiss()
         }
         binding.imgBtnCancelSources.setOnClickListener {

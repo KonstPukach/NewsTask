@@ -1,6 +1,6 @@
 package com.pukachkosnt.newstask.di.module
 
-import com.pukachkosnt.newstask.ui.dialog.ChooseSourceViewModel
+import com.pukachkosnt.newstask.ui.dialog.choosesource.ChooseSourceViewModel
 import com.pukachkosnt.newstask.ui.listnews.all.ListNewsViewModel
 import com.pukachkosnt.newstask.ui.listnews.favorites.FavoritesViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel

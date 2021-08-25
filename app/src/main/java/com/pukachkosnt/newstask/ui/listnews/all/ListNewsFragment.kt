@@ -10,8 +10,8 @@ import androidx.fragment.app.setFragmentResultListener
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
 import com.pukachkosnt.newstask.extensions.convertToPx
-import com.pukachkosnt.newstask.ui.dialog.BottomSheetChooseSourceDialogFragment
-import com.pukachkosnt.newstask.ui.dialog.BottomSheetChooseSourceDialogFragment.Companion.KEY_CLOSE_TYPE
+import com.pukachkosnt.newstask.ui.dialog.choosesource.BottomSheetChooseSourceDialogFragment
+import com.pukachkosnt.newstask.ui.dialog.choosesource.BottomSheetChooseSourceDialogFragment.Companion.KEY_CLOSE_TYPE
 import com.pukachkosnt.newstask.ui.dialog.chooseoption.BottomSheetChooseFromListDialogFragment.Companion.CHOOSE_FROM_LIST_DIALOG_TAG
 import com.pukachkosnt.newstask.ui.listnews.BaseListNewsFragment
 import com.pukachkosnt.newstask.ui.listnews.ListState
