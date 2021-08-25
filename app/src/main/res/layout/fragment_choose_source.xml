@@ -11,12 +11,14 @@
         android:orientation="horizontal"
         android:background="@color/cardview_dark_background">
         <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/img_btn_cancel_sources"
             android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical|start"
             android:src="@drawable/ic_baseline_close_24"
             android:background="?android:selectableItemBackground"/>
-        <ImageButton
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/img_btn_save_sources"
             android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical|end"

@@ -1,6 +1,7 @@
 package com.pukachkosnt.newstask.model
 
-open class Option(
+abstract class Option(
+    open val id: String,
     val title: String,
-    val checked: Boolean = false
+    open val checked: Boolean = false
 )

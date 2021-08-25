@@ -19,7 +19,8 @@ class NewsDataSource(
     private val newsFetchByTimeIntervalRepository: NewsByTimeIntervalRepository,
     private val dbRepository: FavoritesRepository,
     private val lastViewedArticleRepository: LastViewedArticleRepository,
-    private val maxPages: Int
+    private val maxPages: Int,
+    private val sources: Set<String>
 ) : PagingSource<Int, ArticleModel>() {
     private val _dataList: MutableList<ArticleModel> = mutableListOf()
     val dataList: List<ArticleModel> = _dataList
@@ -58,7 +59,8 @@ class NewsDataSource(
                 favoriteArticlesJob.await(),
                 newsFetchByTimeIntervalRepository.fetchNewsWithTimeInterval(
                     calendarStart.time,
-                    calendarFinish.time
+                    calendarFinish.time,
+                    sources
                 )
             )
             val prevKey = if (pageNumber > 0) pageNumber - 1 else null

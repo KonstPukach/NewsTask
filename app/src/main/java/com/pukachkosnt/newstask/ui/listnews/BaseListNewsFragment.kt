@@ -1,7 +1,10 @@
 package com.pukachkosnt.newstask.ui.listnews
 
+import android.os.Bundle
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -10,6 +13,8 @@ import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.newstask.NewsNavGraphDirections
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 abstract class BaseListNewsFragment : Fragment(), ArticleHolder.Callbacks {
     protected abstract val viewModel: BaseNewsViewModel

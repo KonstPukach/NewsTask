@@ -10,9 +10,10 @@ import androidx.fragment.app.setFragmentResultListener
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
 import com.pukachkosnt.newstask.extensions.convertToPx
+import com.pukachkosnt.newstask.ui.dialog.BottomSheetChooseSourceDialogFragment
+import com.pukachkosnt.newstask.ui.dialog.BottomSheetChooseSourceDialogFragment.Companion.KEY_CLOSE_TYPE
+import com.pukachkosnt.newstask.ui.dialog.chooseoption.BottomSheetChooseFromListDialogFragment.Companion.CHOOSE_FROM_LIST_DIALOG_TAG
 import com.pukachkosnt.newstask.ui.listnews.BaseListNewsFragment
-import com.pukachkosnt.newstask.ui.dialog.BottomSheetChooseFromListDialogFragment
-import com.pukachkosnt.newstask.ui.dialog.BottomSheetChooseFromListDialogFragment.Companion.CHOOSE_FROM_LIST_DIALOG_TAG
 import com.pukachkosnt.newstask.ui.listnews.ListState
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -33,6 +34,15 @@ class ListNewsFragment : BaseListNewsFragment() {
             val deletedItemsSet: HashSet<String> =
                 bundle.getStringArrayList(KEY_DELETED_ITEMS)?.toHashSet() ?: hashSetOf()
             viewModel.refreshFavoriteArticles(deletedItemsSet)
+        }
+
+        setFragmentResultListener(F_RESULT_SOURCES) { _, bundle ->
+            val closeType = bundle.getSerializable(KEY_CLOSE_TYPE)
+                    as BottomSheetChooseSourceDialogFragment.CloseType
+            if (closeType == BottomSheetChooseSourceDialogFragment.CloseType.SAVE) {
+                viewModel.refreshSources()
+                viewModel.fetchNews()
+            }
         }
 
         setHasOptionsMenu(true)
@@ -67,7 +77,7 @@ class ListNewsFragment : BaseListNewsFragment() {
         }
 
         binding.btnSource.setOnClickListener {
-            BottomSheetChooseFromListDialogFragment().showNow(
+            BottomSheetChooseSourceDialogFragment().showNow(
                 parentFragmentManager,
                 CHOOSE_FROM_LIST_DIALOG_TAG
             )
@@ -223,6 +233,7 @@ class ListNewsFragment : BaseListNewsFragment() {
         private const val SAVED_SEARCH_QUERY_KEY = "SEARCH_VIEW_QUERY"
 
         const val F_RESULT_DELETED_ITEMS = "F_RESULT_DELETED_ITEMS"
+        const val F_RESULT_SOURCES = "F_RESULT_SOURCES"
         const val KEY_DELETED_ITEMS = "KEY_DELETED_ITEMS"
 
         private const val MAX_SEARCH_VIEW_WIDTH_DP = 250f // dp

@@ -1,4 +1,4 @@
-package com.pukachkosnt.newstask.ui.dialog
+package com.pukachkosnt.newstask.ui.dialog.chooseoption
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,10 +8,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.pukachkosnt.newstask.databinding.FragmentChooseSourceBinding
 import com.pukachkosnt.newstask.model.Option
-import com.pukachkosnt.newstask.ui.dialog.adapter.OptionsAdapter
 
-class BottomSheetChooseFromListDialogFragment() : BottomSheetDialogFragment() {
-    private lateinit var binding: FragmentChooseSourceBinding
+/*
+ * A general fragment to all fragment where user must choose the one option from a list
+ */
+
+abstract class BottomSheetChooseFromListDialogFragment<T : Option>
+    : BottomSheetDialogFragment(), OptionHolder.Actions<T> {
+    protected lateinit var binding: FragmentChooseSourceBinding
+    protected abstract val viewModel: ChooseFromListViewModel<T>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -20,17 +25,21 @@ class BottomSheetChooseFromListDialogFragment() : BottomSheetDialogFragment() {
     ): View {
         binding = FragmentChooseSourceBinding.inflate(layoutInflater)
 
-        val options = listOf(
-            Option("BBC"), Option("Times"), Option("Forbes"),
-            Option("BBC"), Option("Times"), Option("Forbes")
-        )
-
         binding.recyclerViewSource.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
-            adapter = OptionsAdapter(layoutInflater, options)
         }
+
+        viewModel.listOptions.observe(viewLifecycleOwner) {
+            binding.recyclerViewSource.adapter = OptionsAdapter(layoutInflater, it, this)
+        }
+
         return binding.root
+    }
+
+    override fun onChooseOption(option: T) {
+        viewModel.refreshSources(option)
+        binding.recyclerViewSource.adapter?.notifyDataSetChanged()
     }
 
     companion object {
