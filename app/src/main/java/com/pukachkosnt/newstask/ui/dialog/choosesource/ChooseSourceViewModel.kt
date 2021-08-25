@@ -13,13 +13,15 @@ class ChooseSourceViewModel(
     private val getNewsSourcesUseCase: GetNewsSourcesUseCase,
     private val sourcesIdsRepository: SourcesIdsRepository
 ) : ChooseFromListViewModel<Source>() {
-    override val _listOptions: MutableLiveData<MutableList<Source>> = MutableLiveData()
+    override val _listOptionsLiveData: MutableLiveData<MutableList<Source>> = MutableLiveData()
+    private lateinit var listOptions: MutableList<Source>
 
     init {
         viewModelScope.launch {
-            _listOptions.postValue(getNewsSourcesUseCase.getNewsSources().map {
+            listOptions = getNewsSourcesUseCase.getNewsSources().map {
                 it.mapToUiModel()
-            }.toMutableList())
+            }.toMutableList()
+            _listOptionsLiveData.postValue(listOptions)
         }
     }
 
@@ -27,7 +29,7 @@ class ChooseSourceViewModel(
         var isDifferent = false
         val startingSources: Set<String> = sourcesIdsRepository.getNewsSources()
         val sourcesToSave: MutableSet<String> = mutableSetOf()
-        _listOptions.value?.forEach {
+        listOptions.forEach {
             if (it.checked) {
                 sourcesToSave.add(it.id)
                 if (!startingSources.contains(it.id)) {
@@ -41,10 +43,8 @@ class ChooseSourceViewModel(
         return isDifferent
     }
 
-    override fun refreshSources(option: Source) {
-        val index = _listOptions.value?.indexOfFirst { it.id == option.id }
-        index?.let {
-            _listOptions.value?.set(it, option.copy(isFav = !option.checked))
-        }
+    override fun refreshSources(option: Source, isChecked: Boolean) {
+        val index = listOptions.indexOfFirst { it.id == option.id }
+        listOptions[index] = option.copy(isFav = isChecked)
     }
 }

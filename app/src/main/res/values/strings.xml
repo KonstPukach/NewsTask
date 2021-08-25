@@ -12,6 +12,7 @@
     <string name="notif_new_news">Read fresh news!</string>
     <string name="source">Source</string>
     <string name="ok">ok</string>
+    <string name="nothing_found_sources">Nothing found. Check your internet connection or try it later</string>
 
     <string-array name="months">
         <item>January</item>

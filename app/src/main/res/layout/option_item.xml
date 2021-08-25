@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:paddingHorizontal="20dp">
+    android:paddingHorizontal="20dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?android:attr/selectableItemBackground">
 
     <CheckedTextView
         android:id="@+id/checked_text_view_option_title"
@@ -14,4 +18,10 @@
         android:checkMarkTint="@color/black"
         android:textSize="20sp"
         android:gravity="center"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/light_gray"
+        android:layout_gravity="bottom"
+        />
 </FrameLayout>

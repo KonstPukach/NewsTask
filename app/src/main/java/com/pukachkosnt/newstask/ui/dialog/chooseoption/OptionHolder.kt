@@ -16,11 +16,14 @@ class OptionHolder<T : Option>(
         binding.checkedTextViewOptionTitle.isChecked = item.checked
 
         itemView.setOnClickListener {
-            actions.onChooseOption(item)
+            with(binding.checkedTextViewOptionTitle) {
+                isChecked = !isChecked
+                actions.onChooseOption(item, isChecked)
+            }
         }
     }
 
     interface Actions<T : Option> {
-        fun onChooseOption(option: T)
+        fun onChooseOption(option: T, isChecked: Boolean)
     }
 }

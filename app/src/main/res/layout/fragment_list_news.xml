@@ -42,6 +42,7 @@
         android:layout_margin="24dp"
         app:srcCompat="@drawable/ic_baseline_sort_24"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
-        android:backgroundTint="@color/cardview_dark_background"
+        app:backgroundTint="@color/light_blue"
+        android:visibility="gone"
         />
 </com.google.android.material.circularreveal.coordinatorlayout.CircularRevealCoordinatorLayout>

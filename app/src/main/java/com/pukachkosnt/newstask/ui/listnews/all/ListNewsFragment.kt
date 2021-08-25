@@ -66,6 +66,7 @@ class ListNewsFragment : BaseListNewsFragment() {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentListNewsBinding.inflate(layoutInflater)
+        binding.btnSource.isVisible = true
         binding.swipeRefreshListNews.setOnRefreshListener {       //  setup refreshing
             viewModel.fetchNews()
             searchView.apply {

@@ -24,8 +24,8 @@ class BottomSheetChooseSourceDialogFragment : BottomSheetChooseFromListDialogFra
         }
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroy() {
+        super.onDestroy()
         setFragmentResult(
             ListNewsFragment.F_RESULT_SOURCES,
             Bundle().apply {

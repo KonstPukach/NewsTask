@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import com.pukachkosnt.newstask.model.Option
 
 abstract class ChooseFromListViewModel<T : Option> : ViewModel() {
-    protected abstract val _listOptions: LiveData<MutableList<T>>
+    protected abstract val _listOptionsLiveData: LiveData<MutableList<T>>
 
-    val listOptions: LiveData<List<T>>
-        get() = _listOptions as LiveData<List<T>>
+    val listOptionsLiveData: LiveData<List<T>>
+        get() = _listOptionsLiveData as LiveData<List<T>>
 
-    abstract fun refreshSources(option: T)
+    abstract fun refreshSources(option: T, isChecked: Boolean)
 }
