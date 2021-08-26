@@ -7,6 +7,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
+import androidx.navigation.fragment.findNavController
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
 import com.pukachkosnt.newstask.extensions.convertToPx
@@ -78,10 +79,7 @@ class ListNewsFragment : BaseListNewsFragment() {
         }
 
         binding.btnSource.setOnClickListener {
-            BottomSheetChooseSourceDialogFragment().showNow(
-                parentFragmentManager,
-                CHOOSE_FROM_LIST_DIALOG_TAG
-            )
+            findNavController().navigate(R.id.action_to_choose_source_dialog)
         }
 
         setupRecyclerView()

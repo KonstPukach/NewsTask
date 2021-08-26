@@ -24,6 +24,9 @@
             app:destination="@id/settings_fragment"
             app:enterAnim="@anim/anim_slide_from_right"
             app:popExitAnim="@anim/anim_slide_to_right" />
+        <action
+            android:id="@+id/action_to_choose_source_dialog"
+            app:destination="@id/choose_source_dialog" />
     </fragment>
 
     <fragment
@@ -39,6 +42,13 @@
         android:label="settings_fragment"
         tools:layout="@xml/settings">
     </fragment>
+
+    <dialog
+        android:id="@+id/choose_source_dialog"
+        android:name="com.pukachkosnt.newstask.ui.dialog.choosesource.BottomSheetChooseSourceDialogFragment"
+        android:label="choose_source_dialog"
+        tools:layout="@layout/fragment_choose_source">
+    </dialog>
 
     <activity
         android:id="@+id/web_activity"
