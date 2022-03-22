@@ -18,12 +18,14 @@
             android:id="@+id/action_to_favorites_fragment"
             app:destination="@id/favorites_fragment"
             app:enterAnim="@anim/anim_slide_from_right"
-            app:popExitAnim="@anim/anim_slide_to_right" />
+            app:exitAnim="@anim/anim_slide_to_left"
+            app:popEnterAnim="@anim/anim_slide_from_left"
+            app:popExitAnim="@anim/anim_slide_to_right"/>
         <action
             android:id="@+id/action_to_settings_fragment"
             app:destination="@id/settings_fragment"
-            app:enterAnim="@anim/anim_slide_from_right"
-            app:popExitAnim="@anim/anim_slide_to_right" />
+            app:popEnterAnim="@anim/anim_scale_from_big_to_small"
+            app:popExitAnim="@anim/anim_fade_out" />
         <action
             android:id="@+id/action_to_choose_source_dialog"
             app:destination="@id/choose_source_dialog" />
