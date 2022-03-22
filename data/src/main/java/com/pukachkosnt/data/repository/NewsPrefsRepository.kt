@@ -3,11 +3,12 @@ package com.pukachkosnt.data.repository
 import android.content.Context
 import android.content.SharedPreferences
 import com.pukachkosnt.domain.repository.LastViewedArticleRepository
+import com.pukachkosnt.domain.repository.SourcesIdsRepository
 
 class NewsPrefsRepository(
     context: Context,
     prefsPath: String
-) : LastViewedArticleRepository {
+) : LastViewedArticleRepository, SourcesIdsRepository {
     private val prefs: SharedPreferences = context.getSharedPreferences(
         prefsPath,
         Context.MODE_PRIVATE
@@ -23,7 +24,18 @@ class NewsPrefsRepository(
         return prefs.getString(PREF_LAST_ARTICLE_ID, null)
     }
 
+    override fun saveNewsSources(sources: Set<String>) {
+        prefs.edit()
+            .putStringSet(PREF_SOURCES, sources)
+            .apply()
+    }
+
+    override fun getNewsSources(): Set<String> {
+        return prefs.getStringSet(PREF_SOURCES, null) ?: setOf()
+    }
+
     companion object {
-        const val PREF_LAST_ARTICLE_ID = "pref_last_article_id"
+        private const val PREF_LAST_ARTICLE_ID = "pref_last_article_id"
+        private const val PREF_SOURCES = "pref_sources"
     }
 }

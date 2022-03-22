@@ -15,13 +15,18 @@ class NewsApiRepository(private val newsApi: NewsApi)
     override suspend fun fetchNewsWithTimeInterval(
         dateStart: Date,
         dateFinish: Date,
+        source: Set<String>,
         query: String
     ): List<ArticleModel> {
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ROOT)
+        val sourcesString =
+            if (source.isNotEmpty()) source.joinToString(",")
+            else NewsApi.DEFAULT_SOURCE
         val response = newsApi.fetchNewsAsync(
-            sdf.format(dateStart),
-            sdf.format(dateFinish),
-            query
+            dateFrom = sdf.format(dateStart),
+            dateTo = sdf.format(dateFinish),
+            source = sourcesString,
+            query = query
         )
         // map ArticleApiModel to ArticleModel
         return response.body()?.articlesList?.map { it.mapToModel() } ?: listOf()

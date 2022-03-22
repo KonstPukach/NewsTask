@@ -2,7 +2,9 @@ package com.pukachkosnt.data.mapper
 
 import com.pukachkosnt.data.entities.ArticleEntity
 import com.pukachkosnt.data.models.ArticleApiModel
+import com.pukachkosnt.data.models.FullSourceApiModel
 import com.pukachkosnt.domain.models.ArticleModel
+import com.pukachkosnt.domain.models.SourceModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,5 +42,15 @@ fun ArticleEntity.mapToModel(): ArticleModel {
         url = this.url,
         isFavorite = true,   // db articles are favorite by default
         id = this.title + this.publishedAt + this.url
+    )
+}
+
+fun FullSourceApiModel.mapToModel(): SourceModel {
+    return SourceModel(
+        id = this.id,
+        name = this.name,
+        description = this.description,
+        language = this.language,
+        country = this.country
     )
 }

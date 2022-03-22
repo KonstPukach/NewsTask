@@ -1,7 +1,10 @@
 package com.pukachkosnt.newstask.ui.listnews
 
+import android.os.Bundle
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -10,6 +13,8 @@ import com.pukachkosnt.newstask.NewsNavGraphDirections
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
 import com.pukachkosnt.newstask.models.ArticleUiModel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 abstract class BaseListNewsFragment : Fragment(), ArticleHolder.Callbacks {
     protected abstract val viewModel: BaseNewsViewModel
@@ -17,7 +22,21 @@ abstract class BaseListNewsFragment : Fragment(), ArticleHolder.Callbacks {
     protected lateinit var newsAdapter: NewsAdapter
 
     override fun onFavoriteClicked(article: ArticleUiModel) {
-        viewModel.onFavoriteClicked(article)
+      viewModel.onFavoriteClicked(article)
+    }
+                                  
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        lifecycleScope.launch {
+            viewModel.addFavoritesOnError.collect {
+                Toast.makeText(
+                    context,
+                    R.string.toast_article_not_added,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     override fun onItemArticleClicked(article: ArticleUiModel) {
