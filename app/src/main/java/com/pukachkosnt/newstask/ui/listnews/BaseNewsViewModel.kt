@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import androidx.paging.PagingData
 import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.domain.repository.FavoritesRepository
+import com.pukachkosnt.newstask.models.ArticleUiModel
+import com.pukachkosnt.newstask.models.mappers.mapToDomainModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
@@ -30,18 +32,18 @@ abstract class BaseNewsViewModel(
     }
 
     open suspend fun addFavoriteArticleAsync(
-        articleModel: ArticleModel
+        articleModel: ArticleUiModel
     ): Result<ArticleModel> {
-        return favoritesRepository.addArticle(articleModel)
+        return favoritesRepository.addArticle(articleModel.mapToDomainModel())
     }
 
     open suspend fun deleteFavoriteArticleAsync(
-        articleModel: ArticleModel
+        articleModel: ArticleUiModel
     ): Result<ArticleModel> {
-        return favoritesRepository.deleteArticle(articleModel)
+        return favoritesRepository.deleteArticle(articleModel.mapToDomainModel())
     }
 
-    fun onFavoriteClicked(article: ArticleModel) {
+    fun onFavoriteClicked(article: ArticleUiModel) {
         viewModelScope.launch {
             val newArticle = article.copy(isFavorite = !article.isFavorite)
 

@@ -5,6 +5,8 @@ import androidx.paging.*
 import com.pukachkosnt.domain.FavoritesDataSource
 import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.domain.repository.FavoritesRepository
+import com.pukachkosnt.newstask.models.ArticleUiModel
+import com.pukachkosnt.newstask.models.mappers.mapToDomainModel
 import com.pukachkosnt.newstask.ui.listnews.BaseNewsViewModel
 import com.pukachkosnt.newstask.ui.listnews.ListState
 
@@ -31,20 +33,20 @@ class FavoritesViewModel(
     }
 
     override suspend fun deleteFavoriteArticleAsync(
-        articleModel: ArticleModel,
+        articleModel: ArticleUiModel
     ): Result<ArticleModel> {
         return manageFavoriteArticlesAsync(
-            articleModel,
+            articleModel.mapToDomainModel(),
             false,
             _deletedItems::add
         )
     }
 
     override suspend fun addFavoriteArticleAsync(
-        articleModel: ArticleModel
+        articleModel: ArticleUiModel
     ): Result<ArticleModel> {
         return manageFavoriteArticlesAsync(
-            articleModel,
+            articleModel.mapToDomainModel(),
             true,
             _deletedItems::remove
         )

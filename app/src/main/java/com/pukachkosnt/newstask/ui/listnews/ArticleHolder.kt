@@ -2,80 +2,65 @@ package com.pukachkosnt.newstask.ui.listnews
 
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
-import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.animations.moveViewPosition
 import com.pukachkosnt.newstask.animations.scaleViewFromZero
 import com.pukachkosnt.newstask.databinding.NewsItemBinding
 import com.pukachkosnt.newstask.extensions.convertToPx
 import com.pukachkosnt.newstask.extensions.toBeautifulLocalizedFormat
+import com.pukachkosnt.newstask.models.ArticleUiModel
+import com.pukachkosnt.newstask.utils.doEither
+import com.pukachkosnt.newstask.utils.either
 import com.squareup.picasso.Picasso
 import java.util.*
-
 
 class ArticleHolder(
     itemView: View,
     private val callbacks: Callbacks
 ) : RecyclerView.ViewHolder(itemView) {
     private val binding: NewsItemBinding = NewsItemBinding.bind(itemView)
-    private var showMoreState: Boolean = false  // false - not pressed, true - pressed
 
-    private val heartRedDrawable = ResourcesCompat.getDrawable(
-        itemView.resources,
-        R.drawable.heart_red, null
-    )
+    private var articleModel: ArticleUiModel? = null
 
-    private val heartTransparentDrawable = ResourcesCompat.getDrawable(
-        itemView.resources,
-        R.drawable.heart_transparent, null
-    )
+    private val heartRedDrawable         = ResourcesCompat.getDrawable(itemView.resources, R.drawable.heart_red, null)
+    private val heartTransparentDrawable = ResourcesCompat.getDrawable(itemView.resources, R.drawable.heart_transparent, null)
+
+    private val translationToExpanded       get() = -binding.textViewArticleDescription.totalLinesInExpandedState * SINGLE_LINE_HEIGHT
+    private val translationToExpandedMiddle get() = -(binding.textViewArticleDescription.totalLinesInExpandedState + 1) * SINGLE_LINE_HEIGHT
 
     init {
-        // set "show more" when layout parameters are known
-        // measures view, when the text changes
-        binding.textViewArticleDescription.doAfterTextChanged { setupShowMore() }
-        // measures the view, when the view was drawn
-        binding.textViewArticleDescription.doOnPreDraw { setupShowMore() }
+        binding.textViewArticleDescription.addOnClickListener {
+            articleModel?.toggleCollapsed()?.doEither(t = ::hideMore, f = ::showMore)
+        }
 
-        binding.textViewShowMore.setOnClickListener {
-            if (showMoreState) hideMore()
-            else showMore()
-            showMoreState = !showMoreState
+        binding.imageBtnFavorite.setOnClickListener {
+            articleModel?.let(callbacks::onFavoriteClicked)
+            scaleViewFromZero(it)
         }
     }
 
-    fun bind(article: ArticleModel) {
-        initialSetupTranslation()
-        showMoreState = false
+    fun bind(article: ArticleUiModel) {
+        initializeArticleModel(article)
+
         with(binding) {
-            textViewArticleTitle.text = article.title
-            textViewArticleDescription.text = article.description
-            textViewArticlePublishedAt.text = article.publishedAt.toBeautifulLocalizedFormat(
-                Locale.getDefault().language,
-                itemView.resources.getStringArray(R.array.months)
-            )
-            textViewArticleSource.text = article.sourceName
+            textViewArticleTitle.text              = article.title
+            textViewArticleDescription.initialText = article.description
+            textViewArticleSource.text             = article.sourceName
+            imageBtnFavorite.background            = article.isFavorite.either(t = heartRedDrawable, f = heartTransparentDrawable)
+            textViewArticleDescription.isCollapsed = article.collapsed
+            textViewArticlePublishedAt.text        =
+                article.publishedAt.toBeautifulLocalizedFormat(
+                    Locale.getDefault().language,
+                    itemView.resources.getStringArray(R.array.months)
+                )
 
-            imageBtnFavorite.background = if (article.isFavorite) {
-                heartRedDrawable
-            } else {
-                heartTransparentDrawable
-            }
-
-            imageViewArticleImg.setOnClickListener {
-                callbacks.onItemArticleClicked(article)
-            }
-
-            imageBtnFavorite.setOnClickListener {
-                callbacks.onFavoriteClicked(article)
-                scaleViewFromZero(it)
-            }
+            imageViewArticleImg.setOnClickListener { callbacks.onItemArticleClicked(article) }
         }
-        
+
+        initialSetupTranslation()
+
         Picasso.get()
             .load(article.urlToImage)
             .placeholder(R.drawable.background_article)
@@ -85,63 +70,52 @@ class ArticleHolder(
             .into(binding.imageViewArticleImg)
     }
 
-    private fun setupShowMore() {
-        with(binding) {
-            if (textViewArticleDescription.width > 0) {
-                textViewShowMore.isVisible =
-                    textViewArticleDescription.lineCount > MAX_LINES_COLLAPSED
+    private fun initializeArticleModel(article: ArticleUiModel) {
+        articleModel = article.apply {
+            if (url == articleModel?.url) {
+                collapsed = articleModel?.collapsed ?: true
             }
         }
     }
 
     private fun initialSetupTranslation() {
         with(binding) {
-            linLayoutDescription.translationY = START_Y_POSITION
-            textViewArticleDescription.maxLines = MAX_LINES_COLLAPSED
-            textViewArticleTitle.isVisible = true
-            textViewShowMore.isVisible = false
-            textViewShowMore.setText(R.string.show_more)
+            articleModel?.let { article ->
+                textViewArticleDescription.translationY = article.collapsed.either(
+                    t = START_Y_POSITION,
+                    f = convertToPx(translationToExpanded, itemView.context.resources)
+                )
+                textViewArticleTitle.isVisible = article.collapsed
+
+            }
         }
     }
 
     private fun showMore() {
-        with(binding) {
-            textViewArticleDescription.maxLines = MAX_LINES_EXPANDED
-            moveViewPosition(
-                linLayoutDescription,
-                convertToPx(-(textViewArticleDescription.lineCount + 1) * SINGLE_LINE_HEIGHT,
-                    itemView.context.resources),
-                convertToPx(-(textViewArticleDescription.lineCount + 2) * SINGLE_LINE_HEIGHT,
-                    itemView.context.resources)
-            )
-            textViewArticleTitle.isVisible = false
-            textViewShowMore.setText(R.string.hide_more)
-        }
+        moveViewPosition(
+            view                 = binding.textViewArticleDescription,
+            positionFinish       = convertToPx(translationToExpanded, itemView.context.resources),
+            positionIntermediate = convertToPx(translationToExpandedMiddle, itemView.context.resources)
+        )
+        binding.textViewArticleTitle.isVisible = false
     }
 
     private fun hideMore() {
-        with(binding) {
-            textViewArticleDescription.maxLines = MAX_LINES_COLLAPSED
-            moveViewPosition(
-                linLayoutDescription,
-                START_Y_POSITION,
-                convertToPx( -(textViewArticleDescription.lineCount + 2) * SINGLE_LINE_HEIGHT,
-                    itemView.context.resources)
-            )
-            textViewArticleTitle.isVisible = true
-            textViewShowMore.setText(R.string.show_more)
-        }
+        moveViewPosition(
+            view                 = binding.textViewArticleDescription,
+            positionFinish       = START_Y_POSITION,
+            positionIntermediate = convertToPx(translationToExpandedMiddle, itemView.context.resources)
+        )
+        binding.textViewArticleTitle.isVisible = true
     }
 
     interface Callbacks {
-        fun onFavoriteClicked(article: ArticleModel)
+        fun onFavoriteClicked(article: ArticleUiModel)
 
-        fun onItemArticleClicked(article: ArticleModel)
+        fun onItemArticleClicked(article: ArticleUiModel)
     }
 
     companion object {
-        private const val MAX_LINES_COLLAPSED = 3
-        private const val MAX_LINES_EXPANDED = 10
         private const val TARGET_WIDTH = 370
         private const val TARGET_HEIGHT = 160
 

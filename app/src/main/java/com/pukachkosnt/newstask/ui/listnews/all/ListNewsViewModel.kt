@@ -7,6 +7,8 @@ import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.domain.repository.FavoritesRepository
 import com.pukachkosnt.domain.repository.LastViewedArticleRepository
 import com.pukachkosnt.domain.repository.NewsByTimeIntervalRepository
+import com.pukachkosnt.newstask.models.ArticleUiModel
+import com.pukachkosnt.newstask.models.mappers.mapToDomainModel
 import com.pukachkosnt.newstask.ui.listnews.BaseNewsViewModel
 import com.pukachkosnt.newstask.ui.listnews.ListState
 
@@ -55,15 +57,15 @@ class ListNewsViewModel(
         _newsItemsLiveData.value = ListState.Full(loadedPagingData)
     }
 
-    override suspend fun addFavoriteArticleAsync(articleModel: ArticleModel): Result<ArticleModel> {
+    override suspend fun addFavoriteArticleAsync(articleModel: ArticleUiModel): Result<ArticleModel> {
         val result = super.addFavoriteArticleAsync(articleModel)
-        manageFavoriteArticlesAsync(articleModel, result, true)
+        manageFavoriteArticlesAsync(articleModel.mapToDomainModel(), result, true)
         return result
     }
 
-    override suspend fun deleteFavoriteArticleAsync(articleModel: ArticleModel): Result<ArticleModel> {
+    override suspend fun deleteFavoriteArticleAsync(articleModel: ArticleUiModel): Result<ArticleModel> {
         val result = super.deleteFavoriteArticleAsync(articleModel)
-        manageFavoriteArticlesAsync(articleModel, result, false)
+        manageFavoriteArticlesAsync(articleModel.mapToDomainModel(), result, false)
         return result
     }
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TextViewShowMore">
+        <attr name="text_show_more" format="string"/>
+        <attr name="text_hide_more" format="string"/>
+    </declare-styleable>
+</resources>

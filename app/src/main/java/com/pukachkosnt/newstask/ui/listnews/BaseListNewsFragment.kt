@@ -6,21 +6,21 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
-import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.newstask.NewsNavGraphDirections
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
+import com.pukachkosnt.newstask.models.ArticleUiModel
 
 abstract class BaseListNewsFragment : Fragment(), ArticleHolder.Callbacks {
     protected abstract val viewModel: BaseNewsViewModel
     protected lateinit var binding: FragmentListNewsBinding
     protected lateinit var newsAdapter: NewsAdapter
 
-    override fun onFavoriteClicked(article: ArticleModel) {
+    override fun onFavoriteClicked(article: ArticleUiModel) {
         viewModel.onFavoriteClicked(article)
     }
 
-    override fun onItemArticleClicked(article: ArticleModel) {
+    override fun onItemArticleClicked(article: ArticleUiModel) {
         val destination = NewsNavGraphDirections.actionToWebActivity(article.url)
         findNavController().navigate(destination)
     }
