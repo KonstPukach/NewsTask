@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
+import androidx.paging.map
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
+import com.pukachkosnt.newstask.models.mappers.mapToUiModel
 import com.pukachkosnt.newstask.ui.listnews.BaseListNewsFragment
 import com.pukachkosnt.newstask.ui.listnews.all.ListNewsFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -41,14 +43,11 @@ class FavoritesFragment : BaseListNewsFragment() {
 
     override fun setupRecyclerView() {
         super.setupRecyclerView()
-        viewModel.newsItemsLiveData.observe(    // submit data to an adapter
-            viewLifecycleOwner,
-            {
-                it?.let {
-                    newsAdapter.submitData(lifecycle, it.data)
-                }
+        viewModel.newsItemsLiveData.observe(viewLifecycleOwner) {
+            it?.let {
+                newsAdapter.submitData(lifecycle, it.data.map { model -> model.mapToUiModel() })
             }
-        )
+        }
     }
 
     override fun onStop() {

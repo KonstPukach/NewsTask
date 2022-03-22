@@ -7,6 +7,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
+import androidx.paging.map
+import com.pukachkosnt.newstask.models.mappers.mapToUiModel
 import androidx.navigation.fragment.findNavController
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
@@ -180,7 +182,7 @@ class ListNewsFragment : BaseListNewsFragment() {
                     } else {
                         binding.textViewNothingFound.isVisible = false
                     }
-                    newsAdapter.submitData(lifecycle, it.data)
+                    newsAdapter.submitData(lifecycle, it.data.map { model -> model.mapToUiModel() })
                 }
             }
         )

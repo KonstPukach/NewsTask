@@ -34,32 +34,18 @@
             android:layout_margin="8dp"
             android:textColor="@color/white"
             android:text="Title"/>
-        <LinearLayout
-            android:id="@+id/lin_layout_description"
+        <com.pukachkosnt.newstask.customview.TextViewShowMore
+            android:id="@+id/text_view_article_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/image_view_article_img"
-            android:orientation="vertical"
-            android:background="@color/semi_transparent_white">
-            <TextView
-                android:id="@+id/text_view_article_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:textSize="12sp"
-                android:maxLines="3"
-                android:textColor="@color/black"
-                android:scrollbars="none"/>
-            <TextView
-                android:id="@+id/text_view_show_more"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:textColor="@color/blue"
-                android:visibility="invisible"
-                android:textSize="12sp"
-                android:text="@string/show_more" />
-        </LinearLayout>
+            android:paddingHorizontal="8dp"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            android:scrollbars="none"
+            app:text_show_more="...show more"
+            app:text_hide_more=""
+            android:background="@color/semi_transparent_white"/>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
