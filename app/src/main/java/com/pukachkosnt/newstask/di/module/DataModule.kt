@@ -7,10 +7,8 @@ import com.pukachkosnt.data.db.NewsDatabase
 import com.pukachkosnt.data.repository.NewsApiRepository
 import com.pukachkosnt.data.repository.NewsDBRepository
 import com.pukachkosnt.data.repository.NewsPrefsRepository
-import com.pukachkosnt.domain.repository.FavoritesRepository
-import com.pukachkosnt.domain.repository.LastViewedArticleRepository
-import com.pukachkosnt.domain.repository.NewsByAmountRepository
-import com.pukachkosnt.domain.repository.NewsByTimeIntervalRepository
+import com.pukachkosnt.data.repository.SourcesApiRepository
+import com.pukachkosnt.domain.repository.*
 import com.pukachkosnt.newstask.App
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -76,6 +74,14 @@ val dataModule = module {
     }
 
     single<LastViewedArticleRepository> {
+        NewsPrefsRepository(androidContext(), App.PREFS_PATH)
+    }
+
+    single<SourcesRepository> {
+        SourcesApiRepository(get())
+    }
+
+    single<SourcesIdsRepository> {
         NewsPrefsRepository(androidContext(), App.PREFS_PATH)
     }
 }

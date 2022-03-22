@@ -7,9 +7,13 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
+import androidx.navigation.fragment.findNavController
 import com.pukachkosnt.newstask.R
 import com.pukachkosnt.newstask.databinding.FragmentListNewsBinding
 import com.pukachkosnt.newstask.extensions.convertToPx
+import com.pukachkosnt.newstask.ui.dialog.choosesource.BottomSheetChooseSourceDialogFragment
+import com.pukachkosnt.newstask.ui.dialog.choosesource.BottomSheetChooseSourceDialogFragment.Companion.KEY_CLOSE_TYPE
+import com.pukachkosnt.newstask.ui.dialog.chooseoption.BottomSheetChooseFromListDialogFragment.Companion.CHOOSE_FROM_LIST_DIALOG_TAG
 import com.pukachkosnt.newstask.ui.listnews.BaseListNewsFragment
 import com.pukachkosnt.newstask.ui.listnews.ListState
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -33,6 +37,15 @@ class ListNewsFragment : BaseListNewsFragment() {
             viewModel.refreshFavoriteArticles(deletedItemsSet)
         }
 
+        setFragmentResultListener(F_RESULT_SOURCES) { _, bundle ->
+            val closeType = bundle.getSerializable(KEY_CLOSE_TYPE)
+                    as BottomSheetChooseSourceDialogFragment.CloseType
+            if (closeType == BottomSheetChooseSourceDialogFragment.CloseType.SAVE) {
+                viewModel.refreshSources()
+                viewModel.fetchNews()
+            }
+        }
+
         setHasOptionsMenu(true)
 
         searchViewState = if (savedInstanceState == null) {
@@ -54,6 +67,7 @@ class ListNewsFragment : BaseListNewsFragment() {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentListNewsBinding.inflate(layoutInflater)
+        binding.btnSource.isVisible = true
         binding.swipeRefreshListNews.setOnRefreshListener {       //  setup refreshing
             viewModel.fetchNews()
             searchView.apply {
@@ -62,6 +76,10 @@ class ListNewsFragment : BaseListNewsFragment() {
             }
             binding.swipeRefreshListNews.isRefreshing = false
             scrollToTop()
+        }
+
+        binding.btnSource.setOnClickListener {
+            findNavController().navigate(R.id.action_to_choose_source_dialog)
         }
 
         setupRecyclerView()
@@ -214,6 +232,7 @@ class ListNewsFragment : BaseListNewsFragment() {
         private const val SAVED_SEARCH_QUERY_KEY = "SEARCH_VIEW_QUERY"
 
         const val F_RESULT_DELETED_ITEMS = "F_RESULT_DELETED_ITEMS"
+        const val F_RESULT_SOURCES = "F_RESULT_SOURCES"
         const val KEY_DELETED_ITEMS = "KEY_DELETED_ITEMS"
 
         private const val MAX_SEARCH_VIEW_WIDTH_DP = 250f // dp

@@ -1,6 +1,7 @@
 package com.pukachkosnt.data.api
 
 import com.pukachkosnt.data.models.NewsApiModel
+import com.pukachkosnt.data.models.SourcesApiModel
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -14,14 +15,15 @@ interface NewsApi {
         @Query("from") dateFrom: String = "",
         @Query("to") dateTo: String = "",
         @Query("q") query: String = "",
-        @Query("language") lang: String = LANG,
-        @Query("domains") domains: String = DOMAIN,
+        @Query("sources") source: String = DEFAULT_SOURCE,
         @Query("pageSize") pageSize: String = PAGE_SIZE
     ): Response<NewsApiModel>
 
+    @GET("v2/top-headlines/sources?")
+    suspend fun fetchSourcesAsync(): Response<SourcesApiModel>
+
     companion object {
-        private const val LANG = "ru"
-        private const val DOMAIN = "3dnews.ru"
-        private const val PAGE_SIZE = "20"
+        const val DEFAULT_SOURCE = "bbc-news"
+        private const val PAGE_SIZE = "100"
     }
 }

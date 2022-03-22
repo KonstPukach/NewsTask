@@ -20,7 +20,7 @@ class NewsQueryInterceptor : Interceptor {
     }
 
     companion object {
-        private const val API_KEY = "ea7b6c86c40843b0a709aec069ae389e"
+        private const val API_KEY = "c8be613a9ae54483b76f9983abcdb548"
         private const val PAGE_SIZE = "100"
     }
 }

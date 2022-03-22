@@ -7,29 +7,32 @@ import com.pukachkosnt.domain.models.ArticleModel
 import com.pukachkosnt.domain.repository.FavoritesRepository
 import com.pukachkosnt.domain.repository.LastViewedArticleRepository
 import com.pukachkosnt.domain.repository.NewsByTimeIntervalRepository
+import com.pukachkosnt.domain.repository.SourcesIdsRepository
 import com.pukachkosnt.newstask.ui.listnews.BaseNewsViewModel
 import com.pukachkosnt.newstask.ui.listnews.ListState
 
 class ListNewsViewModel(
     private val newsByTimeIntervalRepository: NewsByTimeIntervalRepository,
     private val favoritesRepository: FavoritesRepository,
-    private val lastViewedArticleRepository: LastViewedArticleRepository
+    private val lastViewedArticleRepository: LastViewedArticleRepository,
+    private val sourcesIdsRepository: SourcesIdsRepository
 ) : BaseNewsViewModel(favoritesRepository) {
     private var loadedDataList: List<ArticleModel> = listOf() // stores the full list of loaded data
-
+    private var sources: Set<String> = setOf()
     init {
+        refreshSources()
         fetchNews()
     }
 
     fun fetchNews() {
         pagerLiveData.removeObserver(pagerLiveDataObserver)
-
         pagerLiveData = Pager(PagingConfig(PAGE_SIZE)) {
             NewsDataSource(     // set factory
                 newsByTimeIntervalRepository,
                 favoritesRepository,
                 lastViewedArticleRepository,
-                MAX_PAGES
+                MAX_PAGES,
+                sources
             ).also {
                 loadedDataList = it.dataList
             }
@@ -102,6 +105,10 @@ class ListNewsViewModel(
             is ListState.Full -> ListState.Full(tempPagingData)
             else -> ListState.Filtered(tempPagingData, false)
         }
+    }
+
+    fun refreshSources() {
+        sources = sourcesIdsRepository.getNewsSources()
     }
 
     override fun onCleared() {
