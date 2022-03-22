@@ -108,11 +108,15 @@ class TextViewShowMore(context: Context, attrs: AttributeSet) :
 
     private fun refreshText() {
         val initText = initialText ?: return
-        val blackText = if (initText.length > state.maxChars) {
-            initText.substring(0, state.maxChars)
-        } else initText
 
-        setSpannableText(blackText, state.textToAppend)
+        if (isCollapsable) {
+            val blackText = if (initText.length > state.maxChars) {
+                initText.substring(0, state.maxChars)
+            } else initText
+            setSpannableText(blackText, state.textToAppend)
+        } else {
+            text = initText
+        }
     }
 
     private fun setSpannableText(textBlack: String?, textColored: String) {

@@ -32,7 +32,9 @@ class ArticleHolder(
 
     init {
         binding.textViewArticleDescription.addOnClickListener {
-            articleModel?.toggleCollapsed()?.doEither(t = ::hideMore, f = ::showMore)
+            if (binding.textViewArticleDescription.isCollapsable) {
+                articleModel?.toggleCollapsed()?.doEither(t = ::hideMore, f = ::showMore)
+            }
         }
 
         binding.imageBtnFavorite.setOnClickListener {
